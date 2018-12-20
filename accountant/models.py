@@ -28,21 +28,12 @@ class Payments(BaseModel):
     paid_for=models.ForeignKey(Student,on_delete=models.CASCADE)
     paid_method=models.IntegerField(choices=paid_method_c)
     cheque_no=models.CharField(max_length=100,default=None)
-    date_time_of_transaction=models.DateTimeField(auto_now_add=True,unique=True)
+    date_of_transaction=models.DateField(auto_now_add=True)
     short_description=models.TextField()
-
-class Payment_posting_reference(BaseModel):
-    payment_details = models.ForeignKey(Payments,on_delete=models.CASCADE)
-    balance = models.IntegerField(help_text="Negative for dues,0 for all accounts cleared, Positive if payeee is to receive instead")
-
-class Ledger(BaseModel):
-    payment_posting_reference = models.ForeignKey(Payment_posting_reference,on_delete=models.CASCADE)
-    description = models.TextField()
-
 class Studentpayments(BaseModel):
     student = models.ForeignKey(Student,on_delete=models.CASCADE)
     payments = models.ForeignKey(Payments,on_delete=models.CASCADE)
-    ledger = models.ForeignKey(Ledger,on_delete=models.CASCADE)
+
 
 class Fees_due(BaseModel):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)

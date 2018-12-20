@@ -53,14 +53,12 @@ class oldparentserializer(serializers.Serializer):
 	citizenship=serializers.CharField(max_length=10)	
 
 class FatherSerializer(serializers.Serializer):
-	type=serializers.ChoiceField(choices=choices)
 	name=serializers.CharField(max_length=40)
 	mobile=serializers.CharField(max_length=20)
 	job=serializers.CharField(max_length=30)
 	citizenship_no=serializers.CharField(max_length=10)
 
 class MotherSerializer(serializers.Serializer):
-	type=serializers.ChoiceField(choices=choices)
 	name=serializers.CharField(max_length=40)
 	mobile=serializers.CharField(max_length=20)
 	job=serializers.CharField(max_length=30)
