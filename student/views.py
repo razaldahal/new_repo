@@ -177,8 +177,8 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		mother.citizenship_no=data['mother']['citizenship_no']
 		mother.save()
 
-		student.registration_no=data['registration_no']
-		student.save()
+		user_obj.student.registration_no=data['registration_no']
+		user_obj.student.save()
 
 		user_obj.batch=data['batch']
 		user_obj.course=data['course']
