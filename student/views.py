@@ -117,8 +117,80 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 
 			
 		return Response(tmp)
-		
 
+	def update(self,request,pk,format=None):
+		
+		try:
+			user_obj = StudentAdmission.objects.get(id=pk)
+		except:
+			raise serializers.ValidationError({
+				'Detail':['This Id Doesnot Exist']
+				})
+		user = user_obj.student.user
+		serializer=StudentAdmissionSerializer(user_obj,data=request.data)
+		if serializer.is_valid():
+			data=serializer.data
+		c=ContentType.objects.get_for_model(user)
+	
+		address = Address.objects.get(content_type=c,object_id=user.id)
+		phone = Phone.objects.get(content_type=c,object_id=user.id,type=1)
+		#parent = Parent.objects.get(content_type=c,object_id=user.id)
+		father = Parent.objects.get(content_type=c,object_id=user.id,type='Father' )
+		mother = Parent.objects.get(content_type=c,object_id=user.id,type='Mother')
+		admission_date = user_obj.admission_date
+		admission_id = user_obj.student.id,
+		admission_date=user_obj.admission_date.date(),
+		course=user_obj.course.name,
+		batch=user_obj.batch,
+		registration_no=user_obj.student.registration_no
+		user  = UserGetSerializer(user).data		
+		ud = UserDetail.objects.filter(user_id=user.id)
+		if ud:
+			user_detail = UserDetailSerializer(ud.first()).data
+		address_detail = AddressSerializer(address).data
+		phone_data = PhoneSerializer(phone).data
+		phone = phone_data
+		parents={
+			'father':FatherSerializer(father).data,
+			'mother':MotherSerializer(mother).data
+			}
+
+		address.province=data['adress_detail']['province']
+		address.district=data['address_detail']['district']
+		address.city=data['address_detail']['city']
+		address.address=data['address_detail']['address']
+		address.save()
+
+		phone.number=data['phone_detail']['number']
+		phone.type=data['phone_detail']['type']
+		phone.save()
+
+		father.name=data['father']['name']
+		father.mobile=data['father']['mobile']
+		father.job=data['father']['job']
+		father.citizenship_no=data['father']['citizenship_no']
+		father.save()
+
+		mother.name=data['mother']['name']
+		mother.mobile=data['mother']['mobile']
+		mother.job=data['mother']['job']
+		mother.citizenship_no=data['mother']['citizenship_no']
+		mother.save()
+
+		student.registration_no=data['registration_no']
+		student.save()
+
+		user_obj.batch=data['batch']
+		user_obj.course=data['course']
+		user_obj.description=data['description']
+		user_obj.save()
+
+		user_detail.blood_group=data['user_detail']['blood_group']
+		user_detail.mother_tounge=data['user_detail']['mother_tounge']
+		user_detail.nationality=data['user_detail']['nationality']
+		user_detail.citizenship_no=data['user_detail']['citizenship_no']
+		user_detail.religion=data['user_detail']['religion']
+		user_detail.save()
 class StudentAssignmentViewSt(viewsets.ModelViewSet):
 	queryset = StudentAssignment.objects.all()
 	serializer_class = StudentAssignmentSerializer
@@ -233,3 +305,4 @@ class TestStudentViewSet(viewsets.ModelViewSet):
 		temp["student_detail"] = UserGetSerializer(student).data
 		temp["test_detail"] = TestDetailGet(test).data
 		return Response(temp)
+	

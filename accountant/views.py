@@ -4,6 +4,7 @@ from .serializers import *
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 # Create your views here.
+from datetime import datetime
 
 
 class AccountantViewset(viewsets.ModelViewSet):
@@ -60,7 +61,7 @@ class PaymentsViewSet(viewsets.ModelViewSet):
             x=Student.objects.get(id=pf)
             a,b = User.objects.get_or_create(email=pb['email'],defaults={'username':pb['email'],'first_name':pb['first_name'],'last_name':pb['last_name'],'gender':pb['gender'],'type':pb['type']})
             k=User.objects.get(id=a.id)    
-            c,d = Payments.objects.get_or_create(payment_type=data['payment_type'],paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=data['date_of_transaction'],short_description=data['short_description'],cheque_no=data['cheque_no'])
+            c,d = Payments.objects.get_or_create(payment_type=data['payment_type'],paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=data['date_of_transaction'],short_description=data['short_description'],cheque_no=data['cheque_no'])
             i,j = Studentpayments.objects.get_or_create(student=c.paid_for,payments=c)
             if not j:
                 return Response('some error')
@@ -95,9 +96,10 @@ class FeesdueViewSets(viewsets.ModelViewSet):
             a = Student.objects.get(id=data['student'])
             Fees_due.objects.get_or_create(date=data['date'],student_id=a.id,fee_type=data['fee_type'],ac_start_date=data['ac_start_date'],rate=data['rate'])
 
-            b=Payments.objects.filter(paid_for=a).order_by('-date_time_of_transaction')
+            b=Payments.objects.filter(paid_for=a).order_by('-date_of_transaction')
+            payment=0
             if data['fee_type']==0:
-                total=(data['rate']*(data['date'].month-data['ac_start_date'].month))
+                total=data['rate']*(data['date'].month-data['ac_start_date'].month)
                 for payments in b:
                     payment+=payments.paid_amount
                 total_payments=payment
