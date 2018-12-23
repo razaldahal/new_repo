@@ -110,11 +110,11 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 			student,bval = Student.objects.get_or_create(user_id=user.id,registration_no=data['registration_no'])
 
 			StudentAdmission.objects.get_or_create(student_id=student.id,
-												   defaults={
+												   defaults={   
 												   'batch':data['batch'],
 												   'course_id':data['course'],
 												   'description':data['description'],
-												   #'image':data['image']
+												   #'image':data['image
 												   }
 												   )
 												   
@@ -130,86 +130,3 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 					'detail':serializer.errors
 					})
 
-	def update(self,request,pk):
-		serializer=self.get_serializer(data=request.data)
-		if serializer.is_valid():
-			data=serializer.data
-		try:
-			instance = StudentAdmission.objects.get(id=pk)
-		except:
-			raise serializers.ValidationError({'Detail':['This ID doesnt exist']})
-		user=instance.student.user
-		c=ContentType.objects.get_for_model(user)
-		Phone.objects.update_or_create(content_type=c,
-									object_id=user.id,
-									number=data['phone_detail']['number'],
-									type=data['phone_detail']['type']
-									)
-		Address.objects.update_or_create(
-									content_type=c,object_id=user.id,
-									defaults={
-									'province':data['address_detail']['province'],
-									'district':data['address_detail']['district'],
-									'city':data['address_detail']['city'],
-									'address':data['address_detail']['address']
-									}
-									)
-
-		detail = data.get('user_detail', False)
-		if detail:
-			UserDetail.objects.update_or_create(
-											defaults={
-											'blood_group':detail.get('blood_group',''),
-											'nationality':detail.get('nationality',''),
-											'mother_tongue':detail.get('mother_tongue',''),
-											'religion':detail.get('religion',''),
-											'citizenship_no':detail.get('citizenship_no',''),
-											}
-											)
-		
-		if data['father']:
-			Parent.objects.update_or_create(content_type=c,object_id=user.id,
-			defaults={			
-			'name':data['father']['name'],
-			'mobile':data['father']['mobile'],
-			'job':data['father']['job'],
-			'citizenship_no':data['father']['citizenship_no']
-				},
-				type='Father'	
-				)
-		if data['mother']:
-			Parent.objects.update_or_create(content_type=c,object_id=user.id,
-			defaults={			
-				'name':data['mother']['name'],
-				'mobile':data['mother']['mobile'],
-				'job':data['mother']['job'],
-				'citizenship_no':data['mother']['citizenship_no']
-				},
-				type='Mother'
-				)
-		if data['father'] and data['mother']:
-			Parent.objects.update_or_create(content_type=c,object_id=user.id,defaults={'name':data['father']['name'],'mobile':data['father']['mobile'],'job':data['father']['job'],'citizenship_no':data['father']['citizenship_no']},type='Father')
-			Parent.objects.update_or_create(content_type=c,object_id=user.id,defaults={'name':data['mother']['name'],'mobile':data['mother']['mobile'],'job':data['mother']['job'],'citizenship_no':data['mother']['citizenship_no']},type='Mother')
-
-			# 	Father.objects.get_or_create(defaults={'name':Parent.name,'mobile':Parent.mobile,'job':Parent.job,'citizenship':Parent.citizenship})
-			# if data['parent_detail']['type']=='Mother':
-			# 	Mother.objects.get_or_create(defaults={'name':Parent.name,'mobile':Parent.mobile,'job':Parent.job,'citizenship':Parent.citizenship})
-
-
-		student,bval = Student.objects.update_or_create(registration_no=data['registration_no'])
-
-		StudentAdmission.objects.update_or_create(
-											   defaults={
-											   'batch':data['batch'],
-											   'course_id':data['course'],
-											   'description':data['description'],
-											   #'image':data['image']
-											   }
-											   )
-												   
-
-
-
-
-				
-		return Response(data,status=status.HTTP_202_ACCEPTED)

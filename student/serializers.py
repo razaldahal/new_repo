@@ -24,3 +24,5 @@ class TestDetailGet(serializers.Serializer):
 	type = serializers.IntegerField()
 	full_marks = serializers.IntegerField()
 	pass_marks = serializers.IntegerField()
+
+

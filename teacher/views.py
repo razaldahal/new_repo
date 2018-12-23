@@ -88,7 +88,21 @@ class TeacherViewSet(viewsets.ModelViewSet):
 		return Response(output)
 
 
-		
+	def retrieve(self,request,pk):
+		output=[]	
+		teacher=Teacher.objects.get(id=pk)
+		user=teacher.user
+		c=ContentType.objects.get_for_model(user)
+		adress=Address.objects.get(content_type=c,object_id=user.id)
+		phone=Phone.objects.get(content_type=c,object_id=user.id)
+		temp={'id':teacher.id}
+		temp['user']=UserGetSerializer(user).data
+		temp['address_detail']=AddressSerializer(adress).data
+		temp['phone_detail']=PhoneSerializer(phone).data
+		output.append(temp)
+		return Response(output)
+
+
 
 class SubjectViewSet(viewsets.ModelViewSet):
 	queryset = Subject.objects.all()

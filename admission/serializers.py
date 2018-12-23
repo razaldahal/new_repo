@@ -73,9 +73,11 @@ class StudentAdmissionBaseSerializer(serializers.Serializer):
 	registration_no = serializers.IntegerField()
 	batch = serializers.IntegerField()
 	description = serializers.CharField(default='')
+	
 	#image = serializers.ImageField()
 	father=FatherSerializer()
 	mother=MotherSerializer()
+
 
 
 class StudentAdmissionGetSerializer(StudentAdmissionBaseSerializer):
@@ -88,3 +90,5 @@ class StudentAdmissionSerializer(StudentAdmissionBaseSerializer):
 
 
 
+class StudentUpdateSerializer(StudentAdmissionBaseSerializer):
+	pass

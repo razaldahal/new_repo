@@ -30,3 +30,5 @@ class ClassViewSet(viewsets.ModelViewSet):
 				{
 				'Detail':[serializer.errors]
 				})
+
+				

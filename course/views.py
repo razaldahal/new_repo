@@ -111,7 +111,7 @@ class BatchViewSet(viewsets.ModelViewSet):
             else:
                 return Response(data=data,status=status.HTTP_201_CREATED)
         else:
-            raise ValidationError({'Detail':[serializer.errors]})
+            raise ValidationError({'Detail':serializer.errors})
 
     def list(self,request):
         objects=self.queryset
