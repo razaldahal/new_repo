@@ -17,4 +17,3 @@ class StudentAdmission(BaseModel):
 	course = models.ForeignKey(Course,on_delete=models.CASCADE)
 	description = models.CharField(max_length=120)
 	image = models.ImageField("Uploaded image", upload_to=scramble_uploaded_filename)
-	

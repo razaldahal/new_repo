@@ -18,3 +18,5 @@ class GuardianStudent(BaseModel):
 	student = models.ForeignKey(Student,on_delete=models.CASCADE)
 
 
+
+

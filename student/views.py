@@ -10,10 +10,11 @@ from admission.models import StudentAdmission
 from admission.serializers import *
 from main.models import UserDetail
 from .models import Student,TestStudent
-from main.models import Address,Phone,Parent
+from main.models import Address,Phone
 from assignment.models import Assignment,StudentAssignment
 from Section.models import SectionStudent
 from teacher.models import Test
+from admission.serializers import UserGetSerializer
 from .serializers import StudentAssignmentSerializer,StudentAssignmentDetail,AssStdSectionSerializer,TestStudentSerializer,TestDetailGet
 
 
@@ -32,11 +33,6 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		
 			address = Address.objects.get(content_type=c,object_id=user.id)
 			phone = Phone.objects.get(content_type=c,object_id=user.id,type=1)
-			father = Parent.objects.get(content_type=c,object_id=user.id,type='Father')
-			mother = Parent.objects.get(content_type=c,object_id=user.id,type='Mother')
-
-
-
 			admission_date = adm.admission_date
 
 			tmp ={
@@ -59,14 +55,12 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			tmp['address_detail'] = AddressSerializer(address).data
 			phone_data = PhoneSerializer(phone).data
 			tmp['phone'] = phone_data
-			
-			tmp['parents']={
-			'father':FatherSerializer(father).data,
-			'mother':MotherSerializer(mother).data
-			}
+		
+		
 
 
 			output.append(tmp)
+
 
 		return Response(output)
 
@@ -82,13 +76,6 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 	
 		address = Address.objects.get(content_type=c,object_id=user.id)
 		phone = Phone.objects.get(content_type=c,object_id=user.id,type=1)
-		#parent = Parent.objects.get(content_type=c,object_id=user.id)
-		father = Parent.objects.get(content_type=c,object_id=user.id,type='Father' )
-		mother = Parent.objects.get(content_type=c,object_id=user.id,type='Mother')
-
-
-
-
 		admission_date = user_obj.admission_date
 
 		tmp ={
@@ -108,33 +95,9 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		tmp['address_detail'] = AddressSerializer(address).data
 		phone_data = PhoneSerializer(phone).data
 		tmp['phone'] = phone_data
-		#tmp['parent'] = ParentSerializer(parent).data
-		tmp['parents']={
-			'father':FatherSerializer(father).data,
-			'mother':MotherSerializer(mother).data
-			}
-
-			
 		return Response(tmp)
-
-	def update(self,request,pk,format=None):
-		user_obj=StudentAdmission.objects.get(student_id=pk)
-		user = user_obj.student.user
-		c=ContentType.objects.get_for_model(user)
-	
-		address = Address.objects.get(content_type=c,object_id=user.id)
-		phone = Phone.objects.get(content_type=c,object_id=user.id,type=1)
-		#parent = Parent.objects.get(content_type=c,object_id=user.id)
-		father = Parent.objects.get(content_type=c,object_id=user.id,type='Father' )
-		mother = Parent.objects.get(content_type=c,object_id=user.id,type='Mother')
-
-
-	tmp ={
 		
-	}
 
-
-		
 class StudentAssignmentViewSt(viewsets.ModelViewSet):
 	queryset = StudentAssignment.objects.all()
 	serializer_class = StudentAssignmentSerializer
@@ -249,4 +212,3 @@ class TestStudentViewSet(viewsets.ModelViewSet):
 		temp["student_detail"] = UserGetSerializer(student).data
 		temp["test_detail"] = TestDetailGet(test).data
 		return Response(temp)
-	

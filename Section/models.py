@@ -2,7 +2,7 @@ from django.db import models
 
 from main.models import BaseModel
 from Class.models import Class
-from student.models import Student
+#from student.models import Student
 from teacher.models import Subject,Teacher
 
 
@@ -25,6 +25,7 @@ class TeacherSection(BaseModel):
 	subject = models.ForeignKey(Subject,on_delete=models.CASCADE)
 	section = models.ForeignKey(Section,on_delete=models.CASCADE)
 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
+
 
 
 class SectionRoutine(BaseModel):

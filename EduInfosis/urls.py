@@ -22,14 +22,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/library/',include('library.urls')),
-    path('api/accountant/',include('accountant.urls')),
     path('api/admission/',include('admission.urls')),
     path('api/class/',include('Class.urls')),
     path('api/section/',include('Section.urls')),
     path('api/student/',include('student.urls')),
     path('api/course/',include('course.urls')),
-    path('api/guardian/',include('guardian.urls')),
+    path('api/guardian/',include('guardain.urls')),
     path('api/teacher/',include('teacher.urls')),
     path('api/message/',include('message.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

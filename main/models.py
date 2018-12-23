@@ -2,42 +2,40 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import fields
-from django import forms
-from rest_framework.decorators import api_view
-from .helpers.tuple import get_choice_string
+
+
 class BaseModel(models.Model):
 	date_created = models.DateField(auto_now_add=True)
 	date_updated = models.DateField(auto_now=True)
 	date_deleted = models.DateField(null=True,blank=True)
 
-
 	class Meta:
 		abstract = True
 
 USER_TYPE=(
-	(1,'ADMINISTRATOR'),
-	(2,'TEACHER'),
-	(3,'STUDENT'),
-	(4,'GUEST'),
-	(5,'ACCOUNTANT'),
-	(6,'LIBRARIAN'),
+	('ADMINISTRATOR',1),
+	('TEACHER' , 2),
+	('STUDENT' , 3),
+	('GUEST' , 4),
+	('ACCOUNTANT' ,5),
+	('LIBRARIAN' ,6),
 	)
 
 GENDER =(
-	(1,'MALE'),
-	(2,'FEMALE'),
-	(3,'OTHERS'),
+	('MALE',1),
+	('FEMALE',2),
+	('OTHERS',3)
 	)
 
 class User(BaseModel, AbstractUser):
 	type = models.IntegerField(choices=USER_TYPE,null=True)
-	gender = models.IntegerField(choices=GENDER)
-	
-	
+	gender = models.IntegerField(choices=GENDER,null=True)
+
+
 TYPE =(
-	(1,'PHONE'),
-	(2,'LANDLINE'),
-	(3,'CDMA'),
+	('PHONE',1),
+	('LANDLINE',2),
+	('CDMA',3),
 	)
 
 
@@ -48,16 +46,6 @@ class Phone(BaseModel):
 
 	type = models.IntegerField(choices=TYPE)
 	number = models.IntegerField()
-class Parent(BaseModel):
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-	object_id = models.PositiveIntegerField(null=True)
-	content_object = fields.GenericForeignKey('content_type', 'object_id')
-	type=models.CharField(max_length=10)
-	name=models.CharField(max_length=40)
-	mobile=models.CharField(max_length=20)
-	job=models.CharField(max_length=30)
-	citizenship_no=models.CharField(max_length=10)
-
 
 class Address(BaseModel):
 	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)

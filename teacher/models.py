@@ -14,7 +14,6 @@ class Teacher(BaseModel):
 class Subject(BaseModel):
 	name = models.CharField(max_length=120)
 	description = models.CharField(max_length=120)
-	code=models.CharField(max_length=15)
 
 class Resources(BaseModel):
 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)

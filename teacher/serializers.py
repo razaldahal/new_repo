@@ -13,7 +13,7 @@ class TeacherAddSerializer(serializers.Serializer):
 class SubjectSerializer(serializers.Serializer):
 	name = serializers.CharField(max_length=120)
 	description = serializers.CharField(max_length=120)
-	code = serializers.CharField(max_length=15)
+
 class AssignmentSerializer(serializers.Serializer):
 	teacher_section_id = serializers.IntegerField()
 	due_date = serializers.DateField()

@@ -95,7 +95,6 @@ class SectionStudentViewSet(viewsets.ModelViewSet):
 		output = []
 		for obj in objects:
 			temp ={
-			'id':obj.student.user.id,
 			'student_first_name':obj.student.user.first_name,
 			'student_last_name':obj.student.user.last_name,
 			'section_name':obj.section.name,

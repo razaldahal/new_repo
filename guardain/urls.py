@@ -1,11 +1,10 @@
 from django.urls import path,include
 from rest_framework import routers
 
-from guardian import views
+from guardain import views
 
 router = routers.DefaultRouter()
-router.register('guardian',views.GuardianViewSet)
-router.register('guardian_student',views.GuardianStudentViewSet)
+router.register('',views.GuardianViewSet)
 
 urlpatterns =[
 	path('',include(router.urls)),
