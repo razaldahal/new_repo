@@ -90,5 +90,16 @@ class StudentAdmissionSerializer(StudentAdmissionBaseSerializer):
 
 
 
-class StudentUpdateSerializer(StudentAdmissionBaseSerializer):
-	pass
+class StudentUpdateSerializer(serializers.Serializer):
+	user = UserSerializer()
+	user_detail = UserDetailSerializer()
+	phone_detail = PhoneSerializer()
+	address_detail = AddressSerializer()
+	registration_no = serializers.IntegerField()
+	batch = serializers.IntegerField()
+	description = serializers.CharField(default='')
+	
+	#image = serializers.ImageField()
+	father=FatherSerializer()
+	mother=MotherSerializer()
+	course = serializers.IntegerField()
