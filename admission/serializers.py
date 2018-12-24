@@ -26,7 +26,7 @@ class UserDetailSerializer(serializers.Serializer):
 	nationality = serializers.CharField(max_length=120)
 	mother_tongue = serializers.CharField(max_length=120)
 	religion = serializers.IntegerField()
-	citizenship_no = serializers.CharField()
+	citizenship_no = serializers.CharField(required=False)
 
 
 class PhoneSerializer(serializers.Serializer):
@@ -40,7 +40,11 @@ class AddressSerializer(serializers.Serializer):
 	city = serializers.CharField(max_length=120,required=True)
 	address = serializers.CharField(required=True)
 
-
+class ParentSerializer(serializers.Serializer):
+	name = serializers.CharField(max_length=120,required=True)
+	mobile = serializers.CharField(max_length=120,required=True)
+	job = serializers.CharField(max_length=120,required=False)
+	citizen_no = serializers.CharField(max_length=120,required=False)
 
 
 class StudentAdmissionBaseSerializer(serializers.Serializer):
@@ -51,7 +55,9 @@ class StudentAdmissionBaseSerializer(serializers.Serializer):
 	registration_no = serializers.IntegerField()
 	batch = serializers.IntegerField()
 	description = serializers.CharField(default='')
-	image = serializers.ImageField()
+	father = ParentSerializer()
+	mother = ParentSerializer()
+	#image = serializers.ImageField()
 
 
 class StudentAdmissionGetSerializer(StudentAdmissionBaseSerializer):

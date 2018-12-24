@@ -4,19 +4,21 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import serializers
+from rest_framework.parsers import MultiPartParser
 
 from main.models import User,Address,Phone,UserDetail
 from student.models import Student
+from guardain.models import Guardian, GuardianStudent
 from .models import StudentAdmission
 from .serializers import StudentAdmissionSerializer
-from main.helpers.parser import NestedMultipartParser
+#from main.helpers.parser import NestedMultipartParser
 
 
 
 class StudentAdmissionViewSet(viewsets.ModelViewSet):
 	queryset = StudentAdmission.objects.all()
 	serializer_class = StudentAdmissionSerializer
-	parser_classes = (NestedMultipartParser,)
+	#parser_classes = (MultiPartParser,)
 
 
 
@@ -26,8 +28,7 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 		return Response([])
 
 	def create(self,request):
-		print({**request.POST,**request.FILES})
-		serializer = self.get_serializer(data={**request.data,**request.FILES})
+		serializer = self.get_serializer(data=request.data)
 
 
 		if serializer.is_valid():
@@ -86,9 +87,13 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 												   'batch':data['batch'],
 												   'course_id':data['course'],
 												   'description':data['description'],
-												   'image':data['image']
+												   #'image':data['image']
 												   }
 												   )
+
+			# father = data.get('father', False)
+			# if father:
+			# 	g = Guardian.objects.get_or_create()
 
 			return Response(data,status=status.HTTP_201_CREATED)
 
