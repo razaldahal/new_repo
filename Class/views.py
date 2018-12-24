@@ -31,12 +31,12 @@ class ClassViewSet(viewsets.ModelViewSet):
 				'Detail':[serializer.errors]
 				})
 
-		def list(self,request):
-			objects=Class.objects.all()
-			output=[]
-			for obj in objects:
-				temp={'name':obj.name,
-					'description':obj.description
+	def list(self,request):
+		objects=Class.objects.all()
+		output=[]
+		for obj in objects:
+			temp={'name':obj.name,
+				'description':obj.description
 					}
-				output.append(temp)
-			return Response(output)				
+			output.append(temp)
+		return Response(output)				

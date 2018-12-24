@@ -119,7 +119,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         for obj in objects:
             temp={  
                     'id':obj.id,
-                    'course':obj.course,
+                    'course':obj.course.name,
                     'name':obj.name,
                     'start_date':obj.start_date,
                     'end_date':obj.end_date,
