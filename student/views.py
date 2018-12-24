@@ -159,14 +159,14 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			user_detail.citiizenship_no=data['user_detail']['citizenship_no']
 			
 			father.name=data['parent']['father']['name']
-			father.mobile=data['parent'['father']['mobile']
-			father.job=data['parent'['father']['job']
-			father.citizenship_no=data['parent'['father']['citizenship_no']
+			father.mobile=data['parent']['father']['mobile']
+			father.job=data['parent']['father']['job']
+			father.citizenship_no=data['parent']['father']['citizenship_no']
 		
-			mother.name=data['parent'['mother']['name']
-			mother.mobile=data['parent'['mother']['mobile']
-			mother.job=data['parent'['mother']['job']
-			mother.citizenship_no=data['parent'['mother']['citizenship_no']
+			mother.name=data['parent']['mother']['name']
+			mother.mobile=data['parent']['mother']['mobile']
+			mother.job=data['parent']['mother']['job']
+			mother.citizenship_no=data['parent']['mother']['citizenship_no']
 
 			
 			user_obj.batch=data['batch']
