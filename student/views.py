@@ -130,6 +130,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		father = Parent.objects.get(content_type=c,object_id=user.id,type='Father' )
 		mother = Parent.objects.get(content_type=c,object_id=user.id,type='Mother')
 		user_detail=UserDetail.objects.get(user_id=user.id)
+		student=user_obj.student
 		# userd=UserGetSerializer(user).data
 		# address_detail=AddressSerializer(address).data
 		# phone_detail=PhoneSerializer(phone).data
@@ -142,6 +143,13 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		if serializer.is_valid():
 			data=serializer.data
 			
+			user_obj.batch=data['batch']
+		
+			student.registration_no=data['registration_no']
+			
+			user_obj.description=data['description']
+
+			user_obj.course_id=data['course']
 			
 
 			address.province=data['address_detail']['province']
@@ -158,22 +166,19 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			user_detail.religion=data['user_detail']['religion']
 			user_detail.citiizenship_no=data['user_detail']['citizenship_no']
 			
-			father.name=data['parent']['father']['name']
-			father.mobile=data['parent']['father']['mobile']
-			father.job=data['parent']['father']['job']
-			father.citizenship_no=data['parent']['father']['citizenship_no']
+			father.name=data['father']['name']
+			father.mobile=data['father']['mobile']
+			father.job=data['father']['job']
+			father.citizenship_no=data['father']['citizenship_no']
 		
-			mother.name=data['parent']['mother']['name']
-			mother.mobile=data['parent']['mother']['mobile']
-			mother.job=data['parent']['mother']['job']
-			mother.citizenship_no=data['parent']['mother']['citizenship_no']
+			mother.name=data['mother']['name']
+			mother.mobile=data['mother']['mobile']
+			mother.job=data['mother']['job']
+			mother.citizenship_no=data['mother']['citizenship_no']
 
 			
-			user_obj.batch=data['batch']
-		
-			user_obj.student.registration_no=data['registration_no']
-			
-			user_obj.description=data['description']
+
+
 
 
 			address.save()
@@ -181,6 +186,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			father.save()
 			mother.save()
 			phone.save()
+			student.save()
 			user_obj.save()
 
 			return Response(serializer.data)

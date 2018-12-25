@@ -10,6 +10,11 @@ class TeacherAddSerializer(serializers.Serializer):
 	address_detail = AddressSerializer()
 	qualification = serializers.CharField(max_length=120)
 
+class TeacherUpdateSerializer(serializers.Serializer):
+	phone_detail = PhoneSerializer()
+	address_detail = AddressSerializer()
+	qualification = serializers.CharField(max_length=120)
+
 class SubjectSerializer(serializers.Serializer):
 	name = serializers.CharField(max_length=120)
 	description = serializers.CharField(max_length=120)

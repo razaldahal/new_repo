@@ -9,7 +9,7 @@ from assignment.models import Assignment
 from .models import Teacher,Subject,Resources,Test
 from Section.models import TeacherSection
 from admission.serializers import UserGetSerializer,AddressSerializer,PhoneSerializer
-from .serializers import TeacherAddSerializer,SubjectSerializer,AssignmentSerializer,TeacherDetailAssignment,SubjectDetailAssignment,AssignmentDetail,ResourcesSerializer,ResourceDetailSerializer,TestSerializer
+from .serializers import TeacherAddSerializer,TeacherUpdateSerializer,SubjectSerializer,AssignmentSerializer,TeacherDetailAssignment,SubjectDetailAssignment,AssignmentDetail,ResourcesSerializer,ResourceDetailSerializer,TestSerializer
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
@@ -88,19 +88,48 @@ class TeacherViewSet(viewsets.ModelViewSet):
 		return Response(output)
 
 
-	def retrieve(self,request,pk):
-		output=[]	
+	def retrieve(self,request,pk):	
 		teacher=Teacher.objects.get(id=pk)
 		user=teacher.user
 		c=ContentType.objects.get_for_model(user)
-		adress=Address.objects.get(content_type=c,object_id=user.id)
+		address=Address.objects.get(content_type=c,object_id=user.id)
 		phone=Phone.objects.get(content_type=c,object_id=user.id)
 		temp={'id':teacher.id}
 		temp['user']=UserGetSerializer(user).data
-		temp['address_detail']=AddressSerializer(adress).data
+		temp['address_detail']=AddressSerializer(address).data
 		temp['phone_detail']=PhoneSerializer(phone).data
-		output.append(temp)
-		return Response(output)
+		return Response(temp)
+	
+	def update(self,request,pk):
+		teacher=Teacher.objects.get(id=pk)
+		user=teacher.user
+		c=ContentType.objects.get_for_model(user)
+		address=Address.objects.get(content_type=c,object_id=user.id)
+		phone=Phone.objects.get(content_type=c,object_id=user.id,type=1)
+
+		serializer=TeacherUpdateSerializer(data=request.data)
+		
+		if serializer.is_valid():
+			data=serializer.data
+			print(data)
+			teacher.qualification=data['qualification']
+
+			address.province=data['address_detail']['province']
+			address.city=data['address_detail']['city']
+			address.district=data['address_detail']['district']
+			address.address=data['address_detail']['address']
+			address.save()
+			phone.number=data['phone_detail']['number']
+			phone.type=data['phone_detail']['type']
+			phone.save()
+			
+			
+			
+			teacher.save()
+			
+			return Response(serializer.data)
+		else:
+			return Response(serializer.errors)
 
 
 
