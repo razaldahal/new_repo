@@ -22,6 +22,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 
 	queryset = Student.objects.all()
 	serializer_class = UserGetSerializer
+	http_method = ['get', 'put']
 
 	def list(self,request):
 		output = []
@@ -92,6 +93,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 		admission_date = user_obj.admission_date
 
 		tmp ={
+		'id':user_obj.id,
 		'admission_id': user_obj.student.id,
 		'admission_date':user_obj.admission_date.date(),
 		'course':user_obj.course.name,
