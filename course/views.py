@@ -46,25 +46,26 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-
-            e=Department.objects.get(id=data['department']) 
+            e=Department.objects.get(id=data['department'])
+            if not e:
+                e=Department.objects.get(id=1)    
             obj,created =Course.objects.get_or_create(department=e,
             	name=data['name'],
             	description=data['description'],
                 code=data['code'])
-                #syllabus_name=data['syllabus_name'])
+            #syllabus_name=data['syllabus_name'])
 
             if not created:
             	raise ValidationError({
-	           		'Detail':['Course Already Exist']
-	           		})
+	        	    'Detail':['Course Already Exist']
+	       		    })
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
       
 
         else:
-        	raise ValidationError({
-        		'Detail':[serializer.errors]
+    	    raise ValidationError({
+    		    'Detail':[serializer.errors]
         		})
 
     def retrieve(self,request,pk):
@@ -76,7 +77,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             'name':instance.name,
             'description':instance.description,
             'code':instance.code,
-            'syllabus_name':instance.syllabus_name
+            'department':instance.department.name
         }
         return Response(dict)
 
@@ -86,8 +87,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         for obj in object:
             dct ={'id':obj.id,
+            'department':obj.department.name,
             'name':obj.name,
-            'department':obj.department.name
+            'code':obj.code
             }
             list.append(dct)
 

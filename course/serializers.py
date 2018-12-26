@@ -8,7 +8,6 @@ class DepartmentSerializer(serializers.Serializer):
     name=serializers.CharField()
     description=serializers.CharField()
 class CourseSerializer(serializers.ModelSerializer):
-    department = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all())
     code=serializers.CharField(max_length=16)
     class Meta:
         model=Course

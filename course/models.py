@@ -18,7 +18,7 @@ class Department(BaseModel):
 	
 
 class Course(BaseModel):
-	department = models.ForeignKey(Department,on_delete=models.CASCADE,blank=True)
+	department = models.ForeignKey(Department,on_delete=models.CASCADE,blank=True,null=True)
 	name = models.CharField(max_length=120)
 	description = models.CharField(max_length=120)
 	code = models.CharField(max_length=16)
