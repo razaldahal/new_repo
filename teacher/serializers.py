@@ -2,7 +2,10 @@ from rest_framework import serializers
 
 from admission.serializers import UserSerializer,PhoneSerializer,AddressSerializer
 
-from .models import Subject
+from .models import *
+from student.models import Student
+from course.models import Subject,Batch,Course
+
 
 class TeacherAddSerializer(serializers.Serializer):
 	user_detail = UserSerializer()
@@ -57,3 +60,5 @@ class TestSerializer(serializers.Serializer):
 	type = serializers.IntegerField()
 	full_marks = serializers.IntegerField()
 	pass_marks = serializers.IntegerField()
+  
+

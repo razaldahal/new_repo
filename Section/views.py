@@ -20,7 +20,8 @@ class SectionViewSet(viewsets.ModelViewSet):
     	for obj in objects:
     		temp={
     		'id':obj.id,
-    		'name':obj.name
+    		'name':obj.name,
+			'_class':obj._class.name
     		}
     		output.append(temp)
     	return Response(output)

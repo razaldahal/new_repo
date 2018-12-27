@@ -3,10 +3,11 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import serializers
-
+from student.models import Student
+from course.models import Course,Batch
 from main.models import User,Phone,Address
 from assignment.models import Assignment
-from .models import Teacher,Subject,Resources,Test
+from .models import *
 from Section.models import TeacherSection
 from admission.serializers import UserGetSerializer,AddressSerializer,PhoneSerializer
 from .serializers import TeacherAddSerializer,TeacherUpdateSerializer,SubjectSerializer,AssignmentSerializer,TeacherDetailAssignment,SubjectDetailAssignment,AssignmentDetail,ResourcesSerializer,ResourceDetailSerializer,TestSerializer
@@ -157,6 +158,25 @@ class SubjectViewSet(viewsets.ModelViewSet):
 				'Detail':[serializer.errors]
 				})
 
+	def update(self,request,pk):
+		subject=Subject.objects.get(id=pk)
+		serializer=self.get_serializer(data=request.data)
+
+		if serializer.is_valid():
+			data=serializer.data
+			subject.name=data['name']
+			subject.code=data['code']
+			subject.description=data['description']
+			subject.save()
+		return Response(data,status=status.HTTP_200_OK)
+	def delete(self,request,pk):
+		subject=Subject.objects.get(id=pk)
+		serializer=self.get_serializer(data=request.data)
+		if serializer.is_valid():
+			subject.delete()
+		return Response('Deleted Subject instance succesfully')	
+
+
 class AssignmentViewSet(viewsets.ModelViewSet):
 	queryset = Assignment.objects.all()
 	serializer_class = AssignmentSerializer
@@ -289,3 +309,4 @@ class TestViewSet(viewsets.ModelViewSet):
 			output.append(temp)
 
 		return Response(output)
+

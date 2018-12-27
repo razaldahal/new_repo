@@ -9,10 +9,11 @@ class DepartmentSerializer(serializers.Serializer):
     description=serializers.CharField()
 class CourseSerializer(serializers.ModelSerializer):
     code=serializers.CharField(max_length=16)
+    department=serializers.PrimaryKeyRelatedField(queryset=Department.objects.all())
     class Meta:
         model=Course
         fields=('department','name','code','description')
-
+    
 class CourseGetSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -31,3 +32,18 @@ class BatchGetSerializer(serializers.ModelSerializer):
     class Meta:
         model=Batch
         fields=('id','course','name','start_date','end_date','max_no_of_students')
+
+class AssignSubjectSerializer(serializers.Serializer):
+    course=serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
+    batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
+    subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
+class SubjectAllocationSerializer(serializers.Serializer):
+    course=serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
+    batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
+    subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
+    teacher=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())        
+class ElectiveSubjectSerializer(serializers.Serializer):
+    course=serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
+    batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
+    subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
+    student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())      

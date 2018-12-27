@@ -21,6 +21,7 @@ USER_TYPE=(
 	(4,'GUEST'),
 	(5,'ACCOUNTANT'),
 	(6,'LIBRARIAN'),
+	(7,'BUSSTAFF')
 	)
 
 GENDER =(

@@ -46,9 +46,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            e=Department.objects.get(id=data['department'])
-            if not e:
-                e=Department.objects.get(id=1)    
+            e=Department.objects.get(id=data['department'])    
             obj,created =Course.objects.get_or_create(department=e,
             	name=data['name'],
             	description=data['description'],
@@ -113,7 +111,7 @@ class BatchViewSet(viewsets.ModelViewSet):
             else:
                 return Response(data=data,status=status.HTTP_201_CREATED)
         else:
-            raise ValidationError({'Detail':serializer.errors})
+            raise ValidationError({'Detail':[serializer.errors]})
 
     def list(self,request):
         objects=self.queryset
@@ -142,4 +140,170 @@ class BatchViewSet(viewsets.ModelViewSet):
             'end_date':instance.end_date,
             'max_no_of_students':instance.max_no_of_students
         }
-        return Response(dict)    
+        return Response(dict)
+class AssignSubjectViewset(viewsets.ModelViewSet):
+    serializer_class=AssignSubjectSerializer
+    queryset=AssignSubject.objects.all()
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=AssignSubject.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            if not b:
+                return Response('Already assigned')
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors) 
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objetcs:
+            temp={'batch':obj.batch.name,
+            'course':obj.course.name,
+            'subject':obj.subject.name
+            }           
+            output.append(temp)
+        return Response(output)
+    def update(self,request,pk):
+        a=AssignSubject.objects.get(id=pk)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.batch=Batch.objects.get(id=data['batch'])
+            a.course=Course.objects.get(id=data['course'])
+            a.save()
+            return Response(data)
+        else:
+            return Response(serializer.errors) 
+
+    def delete(self,request,pk):
+        a=AssignSubject.objects.get(id=pk)
+        if a:
+            a.delete()
+            return Response('Deleted!')
+        else:
+            return Response('Not Found!')
+    def  retrieve(self,requets,pk):
+        a=AssignSubject.objects.get(id=pk)
+        temp={'batch':a.batch.name,
+        'course':a.course.name,
+        'subject':a.subject.name
+        }           
+        return Response(temp)          
+
+
+
+class SubjectAllocationViewset(viewsets.ModelViewSet):
+    serializer_class=SubjectAllocationSerializer
+    queryset=SubjectAllocation.objects.all()
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=SubjectAllocation.objects.get_or_create(teacher=Teacher.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            if not b:
+                return Response('Already assigned')
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors) 
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objetcs:
+            temp={'batch':obj.batch.name,
+            'course':obj.course.name,
+            'subject':obj.subject.name,
+            'teacher':obj.teacher.user.first_name+" "+obj.teacher.user.last_name
+            }           
+            output.append(temp)
+        return Response(output)
+    def update(self,request,pk):
+        a=SubjectAllocation.objects.get(id=pk)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.batch=Batch.objects.get(id=data['batch'])
+            a.course=Course.objects.get(id=data['course'])
+            a.teacher=Teacher.objetcs.get(id=data['teacher'])
+            a.save()
+            return Response(data)
+        else:
+            return Response(serializer.errors) 
+
+    def delete(self,request,pk):
+        a=SubjectAllocation.objects.get(id=pk)
+        if a:
+            a.delete()
+            return Response('Deleted!')
+        else:
+            return Response('Not Found!')
+    def  retrieve(self,requets,pk):
+        a=SubjectAllocation.objects.get(id=pk)
+        temp={'batch':a.batch.name,
+        'course':a.course.name,
+        'subject':a.subject.name,
+        'teacher':a.teacher.user.first_name+" "+a.teacher.user.last_name
+        }           
+        return Response(temp)   
+
+class ElectiveSubjectViewset(viewsets.ModelViewSet):
+    serializer_class=ElectiveSubjectSerializer
+    queryset=ElectiveSubject.objects.all()
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=ElectiveSubject.objects.get_or_create(student=Student.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            if not b:
+                return Response('Already assigned')
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors) 
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objetcs:
+            temp={'batch':obj.batch.name,
+            'course':obj.course.name,
+            'subject':obj.subject.name,
+            'teacher':obj.student.user.first_name+" "+obj.student.user.last_name
+            }           
+            output.append(temp)
+        return Response(output)
+    def update(self,request,pk):
+        a=ElectiveSubject.objects.get(id=pk)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.batch=Batch.objects.get(id=data['batch'])
+            a.course=Course.objects.get(id=data['course'])
+            a.student=Student.objetcs.get(id=data['teacher'])
+            a.save()
+            return Response(data)
+        else:
+            return Response(serializer.errors) 
+
+    def delete(self,request,pk):
+        a=ElectiveSubject.objects.get(id=pk)
+        if a:
+            a.delete()
+            return Response('Deleted!')
+        else:
+            return Response('Not Found!')
+    def  retrieve(self,requets,pk):
+        a=ElectiveSubject.objects.get(id=pk)
+        temp={'batch':a.batch.name,
+        'course':a.course.name,
+        'subject':a.subject.name,
+        'student':a.student.user.first_name+" "+a.student.user.last_name
+        }           
+        return Response(temp)           

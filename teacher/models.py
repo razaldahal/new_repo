@@ -1,7 +1,7 @@
 from django.db import models
-
 from main.models import BaseModel,User,Phone,Address
-
+#from course.models import Course,Batch
+#from student.models import Student
 
 class Teacher(BaseModel):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -15,6 +15,7 @@ class Subject(BaseModel):
 	name = models.CharField(max_length=120)
 	description = models.CharField(max_length=120)
 	code=models.CharField(max_length=15)
+	
 
 class Resources(BaseModel):
 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
