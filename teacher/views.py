@@ -157,7 +157,17 @@ class SubjectViewSet(viewsets.ModelViewSet):
 			raise serializers.ValidationError({
 				'Detail':[serializer.errors]
 				})
-
+	def list(self,request):
+		objects=self.queryset
+		output=[]
+		for obj in objects:
+			temp={'id':obj.id,
+			'name':obj.name,
+			'code':obj.code,
+			'description':obj.description
+			}
+			output.append(temp)
+		return Response(output)	
 	def update(self,request,pk):
 		subject=Subject.objects.get(id=pk)
 		serializer=self.get_serializer(data=request.data)
