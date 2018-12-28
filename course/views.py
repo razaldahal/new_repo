@@ -111,7 +111,7 @@ class BatchViewSet(viewsets.ModelViewSet):
             else:
                 return Response(data=data,status=status.HTTP_201_CREATED)
         else:
-            raise ValidationError({'Detail':[serializer.errors]})
+            return Response(serializer.errors)
 
     def list(self,request):
         objects=self.queryset
@@ -159,7 +159,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
     def list(self,request):
         objects=self.queryset
         output=[]
-        for obj in objetcs:
+        for obj in objects:
             temp={'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name

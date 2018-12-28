@@ -32,5 +32,6 @@ urlpatterns = [
     path('api/guardian/',include('guardian.urls')),
     path('api/teacher/',include('teacher.urls')),
     path('api/message/',include('message.urls')),
-    path('api/academics/',include('academics.urls'))
+    path('api/academics/',include('academics.urls')),
+    path('api/transport/',include('transport.urls'))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

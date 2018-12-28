@@ -35,7 +35,9 @@ class ClassViewSet(viewsets.ModelViewSet):
 		objects=Class.objects.all()
 		output=[]
 		for obj in objects:
-			temp={'name':obj.name,
+			temp={
+				'id':obj.id,
+				'name':obj.name,
 				'description':obj.description
 					}
 			output.append(temp)
