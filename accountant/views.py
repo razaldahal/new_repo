@@ -117,7 +117,7 @@ class FeesdueViewSets(viewsets.ModelViewSet):
                 total_payments=payment
                 balance=total-total_payments
 
-            return Response(balance)
+            return Response({'balance':balance})
 
 
 

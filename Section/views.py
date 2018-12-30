@@ -14,6 +14,8 @@ class SectionViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all()
     serializer_class = SectionSerializer
 
+
+
     def list(self,request):
     	objects = self.queryset
     	output = []
@@ -46,6 +48,8 @@ class SectionViewSet(viewsets.ModelViewSet):
     			'Detail':[serializer.errors]
     			})
 	
+
+
 
 class SectionStudentViewSet(viewsets.ModelViewSet):
 	queryset = SectionStudent.objects.all()

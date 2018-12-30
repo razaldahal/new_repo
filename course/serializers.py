@@ -47,3 +47,8 @@ class ElectiveSubjectSerializer(serializers.Serializer):
     batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
     subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())      
+
+class ClassTeacherAllocationSerializer(serializers.Serializer):
+    course=serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
+    batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
+    class_teacher=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) 

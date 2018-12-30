@@ -11,7 +11,7 @@ router.register('batch',views.BatchViewSet)
 router.register('assignsubject',views.AssignSubjectViewset)
 router.register('subjectallocation',views.SubjectAllocationViewset)
 router.register('electivesubject',views.ElectiveSubjectViewset)
-
+router.register('classteacher',views.ClassTeacherAllocationViewSet)
 urlpatterns = [
 	path('',include(router.urls))
 ]

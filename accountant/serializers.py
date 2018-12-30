@@ -19,6 +19,7 @@ class PaymentsSerializer(serializers.Serializer):
 class StudentpaymentsSerializer(serializers.Serializer):
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
     payment=serializers.PrimaryKeyRelatedField(queryset=Payments.objects.all())
+
 class FeesDueSerializer(serializers.Serializer):
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
     fee_type=serializers.IntegerField()

@@ -160,7 +160,8 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'batch':obj.batch.name,
+            temp={'id':obj.id,
+            'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name
             }           
@@ -171,7 +172,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.subject=Subject.objects.get(id=data['subject'])
             a.batch=Batch.objects.get(id=data['batch'])
             a.course=Course.objects.get(id=data['course'])
             a.save()
@@ -215,7 +216,8 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'batch':obj.batch.name,
+            temp={'id':obj.id,
+            'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name,
             'teacher':obj.teacher.user.first_name+" "+obj.teacher.user.last_name
@@ -227,10 +229,10 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.subject=Subject.objects.get(id=data['subject'])
             a.batch=Batch.objects.get(id=data['batch'])
             a.course=Course.objects.get(id=data['course'])
-            a.teacher=Teacher.objetcs.get(id=data['teacher'])
+            a.teacher=Teacher.objects.get(id=data['teacher'])
             a.save()
             return Response(data)
         else:
@@ -240,7 +242,7 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
         a=SubjectAllocation.objects.get(id=pk)
         if a:
             a.delete()
-            return Response('Deleted!')
+            return Response('Deleted!',status=status.HTTP_204_NO_CONTENT)
         else:
             return Response('Not Found!')
     def  retrieve(self,requets,pk):
@@ -283,10 +285,10 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a.subject=Subject.objetcs.get(id=data['subject'])
+            a.subject=Subject.objects.get(id=data['subject'])
             a.batch=Batch.objects.get(id=data['batch'])
             a.course=Course.objects.get(id=data['course'])
-            a.student=Student.objetcs.get(id=data['teacher'])
+            a.student=Student.objects.get(id=data['teacher'])
             a.save()
             return Response(data)
         else:
@@ -307,3 +309,58 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
         'student':a.student.user.first_name+" "+a.student.user.last_name
         }           
         return Response(temp)           
+
+
+class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
+    queryset=ClassTeacherAllocation.objects.all()
+    serializer_class=ClassTeacherAllocationSerializer
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=ClassTeacherAllocation.objects.get_or_create(course=Course.objects.get(id=data['course']),batch=Batch.objects.get(id=data['batch']),class_teacher=Teacher.objects.get(id=data['class_teacher']))
+            if not b:
+                return Response('Already Allocated!')
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objects:
+            temp = {'id':obj.id,
+            'course':obj.course.name,
+            'batch':obj.batch.name,
+            'class_teacher':obj.class_teacher.user.first_name+" "+obj.class_teacher.user.last_name
+            }
+            output.append(temp)
+        return Response(output)
+
+    def update(self,request,pk):
+        try:
+            ct=ClassTeacherAllocation.objects.get(id=pk)
+        except:
+            return ('ClassTeacher object does not exist ')
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            ct.course=Course.objects.get(id=data['course'])
+            ct.batch=Batch.objects.get(id=data['batch'])
+            ct.class_teacher=Teacher.objects.get(id=data['class_teacher'])
+            ct.save()
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors)
+
+    def retrieve(self,request,pk):
+        try:
+            ct=ClassTeacherAllocation.objects.get(id=pk)
+        except:
+            return ('ClassTeacher object does not exist ')
+        temp={'course':ct.course.name,
+        'batch':ct.batch.name,
+        'class_teacher':ct.class_teacher.user.first_name+" "+ct.class_teacher.user.last_name}
+        return Response(temp,status=status.HTTP_200_OK)    
