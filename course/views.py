@@ -149,7 +149,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=AssignSubject.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            a,b=AssignSubject.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
                 return Response('Already assigned')
             else:
@@ -204,7 +204,7 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=SubjectAllocation.objects.get_or_create(teacher=Teacher.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            a,b=SubjectAllocation.objects.get_or_create(teacher=Teacher.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
                 return Response('Already assigned')
             else:
@@ -214,7 +214,7 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
     def list(self,request):
         objects=self.queryset
         output=[]
-        for obj in objetcs:
+        for obj in objects:
             temp={'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name,
@@ -260,7 +260,7 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=ElectiveSubject.objects.get_or_create(student=Student.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objetcs.get(id=data['course']))
+            a,b=ElectiveSubject.objects.get_or_create(student=Student.objects.get(id=data['student']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
                 return Response('Already assigned')
             else:
@@ -270,7 +270,7 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
     def list(self,request):
         objects=self.queryset
         output=[]
-        for obj in objetcs:
+        for obj in objects:
             temp={'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name,
