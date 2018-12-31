@@ -7,7 +7,7 @@ from transport import views
 router = routers.DefaultRouter()
 router.register('vehicle',views.TransportViewSet)
 router.register('busstaff',views.BusStaffViewset)
-router.register('transportallocation',views.TransportAllocationViewSet)
+router.register('allocate',views.TransportAllocationViewSet)
 router.register('route',views.RouteViewSet)
 urlpatterns = [
 	path('',include(router.urls))

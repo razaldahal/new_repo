@@ -15,7 +15,7 @@ class BusStaffViewset(viewsets.ModelViewSet):
             
             c,d=BusStaff.objects.get_or_create(name=data['name'],license_no=data['license_no'],date_of_birth=data['date_of_birth'],current_address=data['current_address'],permanent_address=data['permanent_address'])
             if not d:
-                return Response('Staff already registered!')
+                return Response({'Detail':'Staff already registered!'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)    
         else:
@@ -49,7 +49,7 @@ class BusStaffViewset(viewsets.ModelViewSet):
         try:
             a=BusStaff.objects.get(id=pk)
         except:
-            return Response('Staff does not exist')
+            return Response({'Detail':'Staff does not exist'},status=status.HTTP_404_NOT_FOUND)
         temp={'name':a.name,
             'license_no':a.license_no,
             'current_address':a.current_address,
@@ -63,7 +63,7 @@ class BusStaffViewset(viewsets.ModelViewSet):
         try:
             a=BusStaff.objects.get(id=pk)
         except:
-            return Response('Staff does not exist')
+            return Response({'Detail':'Staff does not exist'},status=status.HTTP_404_NOT_FOUND)
         # user=a.user
         # c=ContentType.objects.get_for_model(user)
         # address=Address.objects.get(content_type=c,object_id=user.id)
@@ -121,7 +121,7 @@ class TransportViewSet(viewsets.ModelViewSet):
             contact_person=data['contact_person']
             )
             if not b:
-                return Response('Already Registered!')
+                return Response({'Detail':'Already Registered!'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
@@ -160,7 +160,7 @@ class RouteViewSet(viewsets.ModelViewSet):
             data=serializer.data
             a,b=Route.objects.get_or_create(start_location=data['start_location'],stop_location=data['stop_location'],start_time=data['start_time'],fee_amount=data['fee_amount'])
             if not b:
-                return Response('ALready added')
+                return Response({'Detail':'Already added!'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
@@ -204,11 +204,11 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
             data=serializer.data
             a,b=TransportAllocation.objects.get_or_create(batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']),_class=Class.objects.get(id=data['_class']),section=Section.objects.get(id=data['section']),student=Student.objects.get(id=data['student']),route=Route.objects.get(id=data['route']))
             if not b:
-                return Response('Already added!')
+                return Response({'Detail':'Alreday Added!'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors)
+            return Response({'Detail':[serializer.errors]})
 
     def list(self,request):
         objects=self.queryset
@@ -229,7 +229,7 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
         try:
             t=TransportAllocation.objects.get(id=pk)
         except:
-            return Response('Object not Found')
+            return Response({'Detail':'Object not Found'},status=status.HTTP_404_NOT_FOUND)
         temp={'batch':t.batch.name,
             'course':t.course.name,
             'route':t.route.start_location+" "+t.route.stop_location,
