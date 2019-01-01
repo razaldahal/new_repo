@@ -10,4 +10,10 @@ class Timetable(BaseModel):
     start_time=models.TimeField()
     end_time=models.TimeField()
     week_day=models.DateField()
+
+
+class AcademicConfig(BaseModel):
+    name=models.CharField(max_length=50)
+    value=models.CharField(max_length=50)
+
     

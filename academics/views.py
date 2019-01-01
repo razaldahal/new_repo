@@ -16,7 +16,7 @@ class TimetableViewSet(viewsets.ModelViewSet):
 
                 a,b=Timetable.objects.get_or_create(teacher=Teacher.objects.get(id=data['teacher']),section=Section.objects.get(id=data['section']),subject=Subject.objects.get(id=data['subject']),start_time=data['start_time'],end_time=data['end_time'],week_day=data['week_day'])
                 if not b:
-                    return Response("Already Added!")
+                    return Response({"Detail":"Already Added!"},status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(data,status=status.HTTP_201_CREATED)            
         else:
@@ -60,13 +60,35 @@ class TimetableViewSet(viewsets.ModelViewSet):
                 timetable.start_time=data['start_time']
                 timetable.end_time=data['end_time']
                 timetable.save()
-                return Response(data)
+                return Response(data,status=status.HTTP_200_OK)
             elif not data['set']:
                 timetable.delete()
-                return Response("Deleted")    
+                return Response({"Success!":"Deleted!"},status=status.HTTP_204_NO_CONTENT)    
         else:
-            return Response(serializer.errors)            
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)            
     
+
+
+# class AcademicConfigViewSet(viewsets.ViewSet):
+
+#     queryset=AcademicConfig.objects.all()
+
+#     def create(self,request):
+#         data=request.data
+#         a,b=AcademicConfig.objects.get_or_create(name=data['name'],value=data['value'])
+#         if not b:
+#             return Response({'Detail':'Config already exists!'},status=status.HTTP_400_BAD_REQUEST)
+
+#         else:
+#             return Response(data,status=status.HTTP_201_CREATED)
+
+#     def list(self,request):
+#         objects=self.queryset
+#         output={}
+#         for obj in objects:
+#             output[obj.name] = obj.value
+            
+#         return Response(output)
 
 
 

@@ -101,7 +101,7 @@ class BusStaffViewset(viewsets.ModelViewSet):
             a.save()
             return Response(data)
         else:
-            return Response(serializer.errors)    
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)    
 
 
 
@@ -148,7 +148,25 @@ class TransportViewSet(viewsets.ModelViewSet):
             # temp['contact_no']=phone.number
             output.append(temp)
 
-        return Response(output)        
+        return Response(output) 
+    def update(self,request,pk):
+        try:
+            t=Transport.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Vehicle does not exist!'},status=status.HTTP_404_NOT_FOUND)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            t.vehicle_no=data['vehicle_no']
+            t.driver=BusStaff.objects.get(id=data['driver'])
+            t.no_of_seats=data['no_of_seats']
+            t.max_allowed=data['max_allowed']
+            t.insurance_renew_date=data['insurance_renew_date']
+            t.contact_person=data['contact_person']
+            t.save()
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)           
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset=Route.objects.all()
@@ -164,15 +182,14 @@ class RouteViewSet(viewsets.ModelViewSet):
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def list(self,request):
         objects=self.queryset
         output=[]
         for obj in objects:
             temp={'id':obj.id,
-            'start_location':obj.start_location,
-            'stop_location':obj.stop_location,
+            'vehicle_route':obj.start_location+" to "+obj.stop_location,
             'start_time':obj.start_time,
             'fee_amount':obj.fee_amount
             }
@@ -192,7 +209,7 @@ class RouteViewSet(viewsets.ModelViewSet):
             a.save()
             return Response(data)
         else:
-            return Response(serializer.errors)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
 class TransportAllocationViewSet(viewsets.ModelViewSet):
     serializer_class=TransportAllocationSerializer
@@ -208,7 +225,7 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response({'Detail':[serializer.errors]})
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def list(self,request):
         objects=self.queryset
@@ -217,7 +234,7 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
             temp={'id':obj.id,
             'batch':obj.batch.name,
             'course':obj.course.name,
-            'route':obj.route.start_location+" "+obj.route.stop_location,
+            'route':obj.route.start_location+" to "+obj.route.stop_location,
             'class':obj._class.name,
             'section':obj.section.name,
             'student':obj.student.user.first_name+" "+obj.student.user.last_name

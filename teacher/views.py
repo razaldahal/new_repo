@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.contenttypes.models import ContentType
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework.response import Response
 from rest_framework import serializers
 from student.models import Student
@@ -58,11 +58,11 @@ class TeacherViewSet(viewsets.ModelViewSet):
 										 }
 										 )
 
-			return Response(data)
+			return Response(data,status=status.HTTP_201_CREATED)
 		else:
-			raise serializers.ValidationError({
-				'Detail':[serializer.errors]
-				})
+			return Response({
+				'Detail':[serializer.errors],
+				},status=status.HTTP_400_BAD_REQUEST)
 	def list(self,request):
 		objects = self.queryset
 		output = []
@@ -128,9 +128,9 @@ class TeacherViewSet(viewsets.ModelViewSet):
 			
 			teacher.save()
 			
-			return Response(serializer.data)
+			return Response(serializer.data,status=status.HTTP_200_OK)
 		else:
-			return Response(serializer.errors)
+			return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -151,7 +151,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 				raise serializers.ValidationError({
 					'Detail':['This Book Is Already Exist']
 					})
-			return Response(serializer.data)
+			return Response(serializer.data,status=status.HTTP_201_CREATED)
 
 		else:
 			raise serializers.ValidationError({
@@ -184,7 +184,9 @@ class SubjectViewSet(viewsets.ModelViewSet):
 		serializer=self.get_serializer(data=request.data)
 		if serializer.is_valid():
 			subject.delete()
-		return Response('Deleted Subject instance succesfully')	
+			return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
+		else:
+			return Respone({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -253,7 +255,7 @@ class ResourcesViewSet(viewsets.ModelViewSet):
 												'name':data['name'],
 												'description':data['description']
 												})
-				return Response(data)
+				return Response(data,status=status.HTTP_201_CREATED)
 			else:
 				raise serializers.ValidationError({
 					'Detail':['Teacher Dont Exist,Please!! Register']
@@ -294,7 +296,7 @@ class TestViewSet(viewsets.ModelViewSet):
 										'full_marks':data['full_marks'],
 										'pass_marks':data['pass_marks']
 										})
-				return Response(data)
+				return Response(data,status=status.HTTP_201_CREATED)
 			else:
 				raise serializers.ValidationError({
 					'Detail':['Teacher Not Exist']

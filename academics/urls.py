@@ -6,7 +6,7 @@ from academics import views
 router=DefaultRouter()
 
 router.register('timetable',views.TimetableViewSet)
-
+#router.register('config',views.AcademicConfigViewSet)
 
 urlpatterns =[
 	path('',include(router.urls)),

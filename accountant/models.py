@@ -38,6 +38,7 @@ class Studentpayments(BaseModel):
 class Fees_due(BaseModel):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     fee_type=models.IntegerField(choices=payment_type_c)
+    
     ac_start_date=models.DateField()
     rate=models.IntegerField()
     date=models.DateField()

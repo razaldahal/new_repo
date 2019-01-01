@@ -107,11 +107,11 @@ class BatchViewSet(viewsets.ModelViewSet):
             data=serializer.data
             a,b = Batch.objects.get_or_create(course=Course.objects.get(id=data['course']),name=data['name'],start_date=data['start_date'],end_date=data['end_date'],max_no_of_students=data['max_no_of_students'])
             if not b:
-                return Response('Batch already exists')
+                return Response({'Detail':'Batch already exists'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data=data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def list(self,request):
         objects=self.queryset
@@ -151,11 +151,11 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
             data=serializer.data
             a,b=AssignSubject.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
-                return Response('Already assigned')
+                return Response({'Detail':'Already assigned'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors) 
+            return Response({'Deatail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST) 
     def list(self,request):
         objects=self.queryset
         output=[]
@@ -178,7 +178,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
             a.save()
             return Response(data)
         else:
-            return Response(serializer.errors) 
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST) 
 
     def delete(self,request,pk):
         a=AssignSubject.objects.get(id=pk)
@@ -186,7 +186,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
             a.delete()
             return Response('Deleted!')
         else:
-            return Response('Not Found!')
+            return Response('Not Found!',status=status.HTTP_404_NOT_FOUND)
     def  retrieve(self,requets,pk):
         a=AssignSubject.objects.get(id=pk)
         temp={'batch':a.batch.name,
@@ -207,11 +207,11 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
             data=serializer.data
             a,b=SubjectAllocation.objects.get_or_create(teacher=Teacher.objects.get(id=data['teacher']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
-                return Response('Already assigned')
+                return Response({'Detail':'Already assigned'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors) 
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST) 
     def list(self,request):
         objects=self.queryset
         output=[]
@@ -236,7 +236,7 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
             a.save()
             return Response(data)
         else:
-            return Response(serializer.errors) 
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST ) 
 
     def delete(self,request,pk):
         a=SubjectAllocation.objects.get(id=pk)
@@ -244,7 +244,7 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
             a.delete()
             return Response('Deleted!',status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response('Not Found!')
+            return Response('Not Found!',status=status.HTTP_404_NOT_FOUND)
     def  retrieve(self,requets,pk):
         a=SubjectAllocation.objects.get(id=pk)
         temp={'batch':a.batch.name,
@@ -264,11 +264,11 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
             data=serializer.data
             a,b=ElectiveSubject.objects.get_or_create(student=Student.objects.get(id=data['student']),subject=Subject.objects.get(id=data['subject']),batch=Batch.objects.get(id=data['batch']),course=Course.objects.get(id=data['course']))
             if not b:
-                return Response('Already assigned')
+                return Response({'Detail':'Already assigned'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors) 
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST) 
     def list(self,request):
         objects=self.queryset
         output=[]
@@ -298,9 +298,9 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
         a=ElectiveSubject.objects.get(id=pk)
         if a:
             a.delete()
-            return Response('Deleted!')
+            return Response({'Success!':'Deleted!'},status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response('Not Found!')
+            return Response({'Detail':'Not Found!'},status=status.HTTP_404_NOT_FOUND)
     def  retrieve(self,requets,pk):
         a=ElectiveSubject.objects.get(id=pk)
         temp={'batch':a.batch.name,
@@ -321,11 +321,11 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
             data=serializer.data
             a,b=ClassTeacherAllocation.objects.get_or_create(course=Course.objects.get(id=data['course']),batch=Batch.objects.get(id=data['batch']),class_teacher=Teacher.objects.get(id=data['class_teacher']))
             if not b:
-                return Response('Already Allocated!')
+                return Response({'Detail':'Already Allocated!'},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            raise serializers.ValidationError({'Detail':[serializer.errors]})
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def list(self,request):
         objects=self.queryset
@@ -343,7 +343,7 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
         try:
             ct=ClassTeacherAllocation.objects.get(id=pk)
         except:
-            return ('ClassTeacher object does not exist ')
+            return Response({'Detail':'ClassTeacher object does not exist '},status=status.HTTP_404_NOT_FOUND)
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
@@ -353,7 +353,7 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
             ct.save()
             return Response(data,status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self,request,pk):
         try:

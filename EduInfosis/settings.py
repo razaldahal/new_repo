@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     'accountant',
     'library',
     'academics',
-    'transport'
+    'transport',
+    'dashboard',
+    'event'
 ]
 
 MIDDLEWARE = [

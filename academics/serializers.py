@@ -11,3 +11,7 @@ class TimetableSerializer(serializers.Serializer):
     week_day=serializers.DateField()
     subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
     set=serializers.BooleanField()
+
+# class AcademicConfigSerializer(serializers.Serializer):
+#     name=serializers.CharField()
+#     value=serializers.CharField()    

@@ -45,7 +45,7 @@ class Request_book(BaseModel):
     book=models.ForeignKey(Books,on_delete=models.CASCADE)
     request_date=models.DateField()
     status=models.CharField(max_length=10)
-    accept=models.BooleanField(null=True)
+    accept=models.NullBooleanField()
 class Book_return(BaseModel):
     book=models.ForeignKey(Issue_book,on_delete=models.CASCADE)
     returned_date=models.DateField()

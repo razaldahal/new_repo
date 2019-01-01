@@ -191,7 +191,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			student.save()
 			user_obj.save()
 
-			return Response(serializer.data)
+			return Response(serializer.data,status=status.HTTP_)
 		else:
 			return Response(serializer.errors)
 
@@ -227,7 +227,7 @@ class StudentAssignmentViewSt(viewsets.ModelViewSet):
 						"SORRY":['Student can submit per assignment only once']
 						})
 
-				return Response(data)
+				return Response(data,status=status.HTTP_201_CREATED)
 			else:
 				raise serializers.ValidationError({
 					"Detail":['Assignment Or Section Not Exist in DAtabase']
@@ -269,7 +269,7 @@ class TestStudentViewSet(viewsets.ModelViewSet):
 													'test':test.first(),
 													'mark_obtained':data['mark_obtained']
 													})
-				return Response(data)
+				return Response(data,status=status.HTTP_201_CREATED)
 			else:
 				if not student:
 					raise serializers.ValidationError({
