@@ -45,7 +45,8 @@ class EventViewSet(viewsets.ModelViewSet):
             obj=Event.objects.get(id=pk)
         except:
             return Response({'Detail':'Event not Found!'},status=status.HTTP_404_NOT_FOUND)
-        temp={'name':obj.name,
+        temp={'id':obj.id,
+            'name':obj.name,
             'description':obj.description,
             'progress':obj.progress,
             'manager':obj.manager.user.first_name+" "+obj.manager.user.last_name,
@@ -84,5 +85,69 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response({'Success!':'Event Deleted'},status=status.HTTP_204_NO_CONTENT)    
 
 
+class EventTaskViewset(viewsets.ModelViewSet):
+    serializer_class=EevntTaskSerializer
+    queryset=EventTask.objects.all()
 
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=EevntTask.objects.get_or_create(event=Event.objects.get(id=data['event']),name=data['name'],status=data['status'],description=data['description'])
+            if not b:
+                return Response({'Detail':'EventTask already created!'},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objects:
+            temp={'id':obj.id,
+            'event':obj.event.name,
+            'name':obj.name,
+            'description':obj.description,
+            'status':obj.status
+            }
+            output.append(temp)
+        return Response(output)
+
+    def retrieve(self,request,pk):
+        try:
+            et=EventTask.objects.get(id=pk)
+        except:
+            return Response({'Detail':'EventTask not found!'},status=status.HTTP_404_NOT_FOUND)
+        temp={'name':et.name,
+        'event':et.event.name,
+        'description':et.description,
+        'status':et.status
+        }        
+        return Response(temp)
+    def update(self,request,pk):
+        try:
+            et=EevntTask.objects.get(id=pk)
+        except:
+            return Response({'Detail':'EventTask not found!'},status=status.HTTP_404_NOT_FOUND)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            et.name=data['name']
+            et.event=Event.objects.get(id=data['event'])
+            et.description=data['description']
+            et.status=data['status']
+            et.save()
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request,pk):
+        try:
+            et=EventTask.objects.get(id=pk)
+        except:
+            return Response({'Detail':'EventTask not found!'},status=status.HTTP_404_NOT_FOUND)
+        et.delete()
+        return Response({'Success!':'Deleted!'},status=status.HTTP_204_NO_CONTENT)
+    
+                

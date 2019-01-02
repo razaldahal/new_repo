@@ -273,10 +273,11 @@ class ElectiveSubjectViewset(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'batch':obj.batch.name,
+            temp={'id':obj.id,
+            'batch':obj.batch.name,
             'course':obj.course.name,
             'subject':obj.subject.name,
-            'teacher':obj.student.user.first_name+" "+obj.student.user.last_name
+            'student':obj.student.user.first_name+" "+obj.student.user.last_name
             }           
             output.append(temp)
         return Response(output)

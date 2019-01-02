@@ -176,7 +176,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=Route.objects.get_or_create(start_location=data['start_location'],stop_location=data['stop_location'],start_time=data['start_time'],fee_amount=data['fee_amount'])
+            a,b=Route.objects.get_or_create(start_location=data['start_location'],stop_location=data['stop_location'],start_time=data['start_time'],fee_amount=data['fee_amount'],vehicle=Transport.objects.get(id=data['vehicle']))
             if not b:
                 return Response({'Detail':'Already added!'},status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -187,8 +187,11 @@ class RouteViewSet(viewsets.ModelViewSet):
     def list(self,request):
         objects=self.queryset
         output=[]
+        print(request.data)
         for obj in objects:
-            temp={'id':obj.id,
+            temp={
+            'id':obj.id,
+            'vehicle':obj.vehicle.vehicle_no,
             'vehicle_route':obj.start_location+" to "+obj.stop_location,
             'start_time':obj.start_time,
             'fee_amount':obj.fee_amount
@@ -197,7 +200,11 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response(output)   
 
     def update(self,request,pk):
-        a=Route.objects.get(id=pk)
+        try:
+            a=Route.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Route not found!'},status=status.HTTP_404_NOT_FOUND)    
+
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
@@ -206,10 +213,34 @@ class RouteViewSet(viewsets.ModelViewSet):
             a.stop_location=data['stop_location']
             a.start_time=data['start_time']
             a.fee_amount=data['fee_amount']
+            a.vehicle=Transport.objects.get(id=data['vehicle'])
             a.save()
             return Response(data)
         else:
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+    def retrieve(self,request,pk):
+
+        try:
+            a=Route.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Route not found!'},status=status.HTTP_404_NOT_FOUND)
+        temp={
+        'start_location':a.start_location,
+        'end_location':a.end_location,
+        'start_time':a.start_time,
+        'vehicle':a.vehicle.vehicle_no,
+        'fee_amount':a.fee_amount
+            }    
+
+
+    def delete(self,request,pk):
+        try:
+            a=Route.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Route not found!'},status=status.HTTP_404_NOT_FOUND)
+        a.delete()
+        return Response({'Success!':'Deleted'},status=status.HTTP_204_NO_CONTENT)    
+
 
 class TransportAllocationViewSet(viewsets.ModelViewSet):
     serializer_class=TransportAllocationSerializer
@@ -258,3 +289,10 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
 
 
 
+    def delete(self,request,pk):
+        try:
+            t=TransportAllocation.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Object not Found'},status=status.HTTP_404_NOT_FOUND)
+        t.delete()
+        return Response({'Success!':'Deleted'},status=status.HTTP_204_NO_CONTENT)        

@@ -8,7 +8,8 @@ class Teacher(BaseModel):
 	qualification = models.CharField(max_length=120)
 
 	def __str__(self):
-		return self.user.first_name
+		return self.user.first_name+" "+self.user.last_name
+
 
 
 class Subject(BaseModel):
@@ -16,6 +17,9 @@ class Subject(BaseModel):
 	description = models.CharField(max_length=120)
 	code=models.CharField(max_length=15)
 	
+	def __str__(self):
+		return self.name
+
 
 class Resources(BaseModel):
 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
@@ -24,7 +28,7 @@ class Resources(BaseModel):
 	#attachment =====
 
 EXAM_TYPE =(
-	('CLASS_TEXT',1),
+	('CLASS_TEST',1),
 	('FIRST_TERMINAL',2),
 	('SECOND_TERMINAL',3),
 	('PRE_BOARD',4),

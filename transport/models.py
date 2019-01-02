@@ -15,21 +15,34 @@ class BusStaff(BaseModel):
     date_of_birth=models.DateField()
     license_no=models.CharField(max_length=20)
     #licence_valid_date=models.DateField()
-class Route(BaseModel):
-    start_location=models.CharField(max_length=30)
-    stop_location=models.CharField(max_length=30)
-    start_time=models.TimeField()
-    fee_amount=models.IntegerField()    
-    
+
+    def __str__(self):
+        return self.name
+
+
 class Transport(BaseModel):
     driver=models.ForeignKey(BusStaff,on_delete=models.CASCADE)
     vehicle_no=models.CharField(max_length=20,unique=True)
+    
     #route=models.ForeignKey(Route,on_delete=models.CASCADE)
     no_of_seats=models.IntegerField()
     max_allowed=models.IntegerField()
     insurance_renew_date=models.DateField()
     #contact_person=models.ForeignKey(User,on_delete=models.CASCADE)
     contact_person=models.CharField(max_length=40)
+    def __str__(self):
+        return "Vehicle_No"+":"+self.vehicle_no
+
+from transport.models import Transport
+class Route(BaseModel):
+    start_location=models.CharField(max_length=30)
+    stop_location=models.CharField(max_length=30)
+    start_time=models.TimeField()
+    vehicle=models.ForeignKey(Transport,on_delete=models.CASCADE)
+    fee_amount=models.IntegerField()    
+    def __str__(self):
+        return self.start_location+" to "+self.stop_location
+
 class TransportAllocation(BaseModel):
     batch=models.ForeignKey(Batch,on_delete=models.CASCADE)
     course=models.ForeignKey(Course,on_delete=models.CASCADE)

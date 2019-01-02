@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from main.models import User,USER_TYPE
 
-
+from main.helpers.tuple import get_choice_string
 
 class CategorySerializer(serializers.Serializer):
     name=serializers.CharField()
@@ -12,27 +12,29 @@ class BooksSerilaizer(serializers.Serializer):
     purchase_date=serializers.DateField()
     bill_no=serializers.CharField()
     isbn_no=serializers.SlugField()
-    no=serializers.CharField(max_length=20)
-    title=serializers.CharField(max_length=30)
-    author=serializers.CharField(max_length=30)
-    edition=serializers.CharField(max_length=20)
+    no=serializers.CharField()
+    title=serializers.CharField()
+    author=serializers.CharField()
+    edition=serializers.CharField()
     category=serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    publisher=serializers.CharField(max_length=30)
+    publisher=serializers.CharField()
     no_of_copies=serializers.IntegerField()
-    shelf_no=serializers.CharField(max_length=20)
-    position=serializers.CharField(max_length=20)
+    shelf_no=serializers.CharField()
+    position=serializers.CharField()
     book_cost=serializers.IntegerField()
-    book_condition=(
-    ('As_new','AS NEW'),
-    ('fine','FINE'),
-    ('verygood','VERY GOOD'),
-    ('good','GOOD'),
-    ('fair','FAIR'),
-    ('poor','POOR'),
-    ('lost','LOST'),
-    ('missing','MISSING')
+    book_condition_c=(
+    (1,'AS NEW'),
+    (2,'FINE'),
+    (3,'VERY GOOD'),
+    (4,'GOOD'),
+    (5,'FAIR'),
+    (6,'POOR'),
+    (7,'LOST'),
+    (8,'MISSING')
     )
-    book_condition=serializers.ChoiceField(choices=book_condition)
+    book_condition=serializers.ChoiceField(choices=book_condition_c)
+    def get_book_condition(self, obj):
+        return get_choice_string(book_condition_c,obj.book_condition)
 class Issue_bookSerilaizer(serializers.Serializer):
     user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     user_type=serializers.ChoiceField(choices=USER_TYPE)

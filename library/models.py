@@ -7,6 +7,10 @@ class Category(BaseModel):
     name=models.CharField(max_length=30)
     section_code=models.SlugField()
 
+    def __str__(self):
+        return self.name
+
+
 class Books(BaseModel):
     purchase_date=models.DateField()
     bill_no=models.CharField(max_length=20)
@@ -21,17 +25,20 @@ class Books(BaseModel):
     shelf_no=models.CharField(max_length=20)
     position=models.CharField(max_length=20)
     book_cost=models.IntegerField()
-    book_condition=(
-    ('As_new','AS NEW'),
-    ('fine','FINE'),
-    ('verygood','VERY GOOD'),
-    ('good','GOOD'),
-    ('fair','FAIR'),
-    ('poor','POOR'),
-    ('lost','LOST'),
-    ('missing','MISSING')
+    book_condition_c=(
+    (1,'AS NEW'),
+    (2,'FINE'),
+    (3,'VERY GOOD'),
+    (4,'GOOD'),
+    (5,'FAIR'),
+    (6,'POOR'),
+    (7,'LOST'),
+    (8,'MISSING')
     )
-    book_condition=models.CharField(max_length=15,choices=book_condition)
+    book_condition=models.IntegerField(choices=book_condition_c)
+    def __str__(self):
+        return self.title+" "+self.isbn_no
+
 
 class Issue_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)

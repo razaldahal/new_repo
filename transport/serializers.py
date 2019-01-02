@@ -15,11 +15,7 @@ class BusStaffSerializer(serializers.Serializer):
     # license_valid_date=serializers.DateField()
     # phone_detail=PhoneSerializer()
     # address_detail=AddressSerializer()
-class RouteSerializer(serializers.Serializer):
-    start_location=serializers.CharField()
-    stop_location=serializers.CharField()
-    start_time=serializers.TimeField()
-    fee_amount=serializers.IntegerField()    
+
 class TransportSerializer(serializers.Serializer):
     driver=serializers.PrimaryKeyRelatedField(queryset=BusStaff.objects.all())
     vehicle_no=serializers.CharField()
@@ -28,7 +24,13 @@ class TransportSerializer(serializers.Serializer):
     max_allowed=serializers.IntegerField()
     insurance_renew_date=serializers.DateField()
     contact_person=serializers.CharField(default='')
-    #contact_person=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())    
+    #contact_person=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+class RouteSerializer(serializers.Serializer):
+    start_location=serializers.CharField()
+    stop_location=serializers.CharField()
+    start_time=serializers.TimeField()
+    fee_amount=serializers.IntegerField()
+    vehicle=serializers.PrimaryKeyRelatedField(queryset=Transport.objects.all())            
 
 class TransportAllocationSerializer(serializers.Serializer):
     batch=serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
