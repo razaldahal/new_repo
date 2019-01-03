@@ -3,7 +3,7 @@ from rest_framework import viewsets,status
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
-
+from rest_framework import filters,generics
 
 # Create your views here.
 class CategoryViewsets(viewsets.ModelViewSet):
@@ -167,20 +167,15 @@ class Book_returnViewsets(viewsets.ModelViewSet):
 
             output.append(temp)
         return Response(output)                   
-class SearchViewset(viewsets.ViewSet):
+class SearchViewset(generics.ListAPIView):
     queryset=Books.objects.all()
-    def list(self,request):
-        qd=request.GET
-        keys=qd.keys()
-        print(keys)
-        values=qd.values()
-        print(values)
-        r=[]
-        for k,v in qd:
-            r=Books.objects.filter(k__icontains=v)
-        return Response(list(r))
+    serializer_class = UserSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = '__all__'
 
-
+    
+    
+   
 
 
         # val=[]
