@@ -231,7 +231,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         'vehicle':a.vehicle.vehicle_no,
         'fee_amount':a.fee_amount
             }    
-
+        return Response(temp)
 
     def delete(self,request,pk):
         try:
@@ -296,3 +296,23 @@ class TransportAllocationViewSet(viewsets.ModelViewSet):
             return Response({'Detail':'Object not Found'},status=status.HTTP_404_NOT_FOUND)
         t.delete()
         return Response({'Success!':'Deleted'},status=status.HTTP_204_NO_CONTENT)        
+
+    def update(self,request,pk):
+        try:
+            t=TransportAllocation.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Object not Found'},status=status.HTTP_404_NOT_FOUND)
+
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            t.batch=Batch.objects.get(id=data['batch'])
+            t.course=Course.objects.get(id=data['course'])
+            t.route=Route.objects.get(id=data['route'])
+            t._class=Class.objects.get(id=data['_class'])
+            t.section=Section.objects.get(id=data['section'])
+            t.student=Student.objects.get(id=data['student'])
+            t.save()
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)    

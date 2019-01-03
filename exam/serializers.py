@@ -12,3 +12,5 @@ class ScheduleSerializer(serializers.Serializer):
         term=serializers.PrimaryKeyRelatedField(queryset=Term.objects.all())
         start_time=serializers.TimeField()
         end_time=serializers.TimeField()
+        date=serializers.DateField()
+

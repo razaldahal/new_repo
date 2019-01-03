@@ -5,6 +5,8 @@ from rest_framework import viewsets,status
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+import datetime
+from datetime import date,time
 
 class TermViewset(viewsets.ModelViewSet):
     queryset=Term.objects.all()
@@ -13,7 +15,7 @@ class TermViewset(viewsets.ModelViewSet):
     def create(self,request):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
-            data=serialzer.data
+            data=serializer.data
             a,b=Term.objects.get_or_create(name=data['name'],start_date=data['start_date'],end_date=data['end_date'],batch=Batch.objects.get(id=data['batch']))
             if not b:
                 return Response({'Term':'Already Created!'},status=status.HTTP_400_BAD_REQUEST)
@@ -69,7 +71,7 @@ class TermViewset(viewsets.ModelViewSet):
         except:
             return Response({'Error':'Exam Term not found!'},status=status.HTTP_404_NOT_FOUND)
         trm.delete()
-        return Response({"Success!":"Deleted"},status=status.HTTP_204_NO_CONTENT)
+        return Response({'Success!':'Deleted'},status=status.HTTP_204_NO_CONTENT)
 
 class ScheduleViewset(viewsets.ModelViewSet):
     serializer_class=ScheduleSerializer
@@ -79,7 +81,7 @@ class ScheduleViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=Schedule.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),term=Term.objects.get(id=data['term']),start_time=data['start_time'],end_time=data['end_time'])
+            a,b=Schedule.objects.get_or_create(subject=Subject.objects.get(id=data['subject']),term=Term.objects.get(id=data['term']),start_time=data['start_time'],end_time=data['end_time'],date=data['date'])
             if not b:
                 return Response({'Schedule':'Already Created'},status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -91,10 +93,13 @@ class ScheduleViewset(viewsets.ModelViewSet):
         output=[]
         for obj in objects:
             temp={'id':obj.id,
+            'date':obj.date,
+            'day':obj.date.strftime("%A"),
             'subject':obj.subject.name,
             'term':obj.term.name,
             'start_time':obj.start_time,
-            'end_time':obj.end_time
+            'end_time':obj.end_time,
+            'batch':obj.term.batch.name
             }
             output.append(temp)
         return Response(output)
@@ -106,7 +111,10 @@ class ScheduleViewset(viewsets.ModelViewSet):
         temp={'subject':s.subject.name,
         'term':s.term.name,
         'start_time':s.start_time,
-        'end_time':s.end_time
+        'end_time':s.end_time,
+        'date':s.date,
+        'day':s.date.strftime("%A"),
+        'batch':s.term.batch.name
         }
         return Response(temp)
 
@@ -123,6 +131,7 @@ class ScheduleViewset(viewsets.ModelViewSet):
             s.term=Term.objects.get(id=data['term'])
             s.start_time=data['start_time']
             s.end_time=data['end_time']
+            s.date=data['date']
             s.subject=Subject.objects.get(id=data['subject'])
             s.save()
             return Response(data,status=status.HTTP_200_OK)

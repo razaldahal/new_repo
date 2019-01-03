@@ -16,7 +16,7 @@ class Schedule(BaseModel):
     term=models.ForeignKey(Term,on_delete=models.CASCADE)
     start_time=models.TimeField()
     end_time=models.TimeField()
-
+    date=models.DateField()
 
 # EXAM_TYPE =(
 # 	('CLASS_TEST',1),
