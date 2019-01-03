@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from rest_framework import filters,generics
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
 class CategoryViewsets(viewsets.ModelViewSet):
@@ -37,7 +38,7 @@ class CategoryViewsets(viewsets.ModelViewSet):
 
 class BooksViewset(viewsets.ModelViewSet):
     queryset=Books.objects.all()
-    serializer_class=BooksSerilaizer
+    serializer_class=BooksSerializer
 
     def create(self,request):
         serilaizer=self.get_serializer(data=request.data)
@@ -167,13 +168,25 @@ class Book_returnViewsets(viewsets.ModelViewSet):
 
             output.append(temp)
         return Response(output)                   
-class SearchViewset(generics.ListAPIView):
+class SearchView(viewsets.GenericViewSet):
     queryset=Books.objects.all()
-    serializer_class = UserSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = '__all__'
-
-    
+    serializer_class = BooksSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('title','purchase_date','bill_no','isbn_no',
+    'no',
+    'title',
+    'author',
+    'edition',
+    'category__name',
+    'publisher',
+    'no_of_copies',
+    'shelf_no',
+    'position',
+    'book_condition')
+    def retrieve(self, request, pk=None):
+        pass
+    def list(self, request):
+        pass
     
    
 
