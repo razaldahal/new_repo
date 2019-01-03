@@ -167,3 +167,57 @@ class Book_returnViewsets(viewsets.ModelViewSet):
 
             output.append(temp)
         return Response(output)                   
+class SearchViewset(viewsets.ViewSet):
+    queryset=Books.objects.all()
+    def list(self,request):
+        qd=request.GET
+        keys=qd.keys()
+        print(keys)
+        values=qd.values()
+        print(values)
+        r=[]
+        for k,v in qd:
+            r=Books.objects.filter(k__icontains=v)
+        return Response(list(r))
+
+
+
+
+        # val=[]
+        # ky=[]
+        # res=[]
+        # result=[]
+        # for key in keys:
+        #     a=qd.__getitem__(key)
+        #     b=key
+        #     val.append(a)
+        #     ky.append(b)
+        
+        # for k in ky:
+        #     for v in val:
+        #         r=Books.objects.filter(k__icontains=v)
+        #         s=r.count()
+        #         for t in range [0:(s-1)]:
+        #             book=r[t]
+        #             res.append(book)
+        #         result.append(res)
+        # return Response(result)                               
+
+
+
+
+
+            
+
+         
+
+
+
+
+
+
+
+
+
+
+

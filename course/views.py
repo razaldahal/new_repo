@@ -46,11 +46,13 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            e=Department.objects.get(id=data['department'])    
-            obj,created =Course.objects.get_or_create(department=e,
+            #e, c=Department.objects.get_or_create(name=data['department'])    
+            obj,created =Course.objects.get_or_create(
             	name=data['name'],
-            	description=data['description'],
-                code=data['code'])
+                code=data['code'],
+                defaults={'description':data['description']}
+                
+                )
             #syllabus_name=data['syllabus_name'])
 
             if not created:
@@ -85,7 +87,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         for obj in object:
             dct ={'id':obj.id,
-            'department':obj.department.name,
+            'department':'',
             'name':obj.name,
             'code':obj.code
             }

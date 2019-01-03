@@ -9,10 +9,10 @@ class DepartmentSerializer(serializers.Serializer):
     description=serializers.CharField()
 class CourseSerializer(serializers.ModelSerializer):
     code=serializers.CharField(max_length=16)
-    department=serializers.PrimaryKeyRelatedField(queryset=Department.objects.all())
+    #department=serializers.CharField()
     class Meta:
         model=Course
-        fields=('department','name','code','description')
+        fields=('name','code','description')
     
 class CourseGetSerializer(serializers.ModelSerializer):
 

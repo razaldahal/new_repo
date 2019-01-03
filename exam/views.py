@@ -44,6 +44,7 @@ class TermViewset(viewsets.ModelViewSet):
             return Response({'Error':'Exam Term not found!'},status=status.HTTP_404_NOT_FOUND)
         temp={'name':term.name,
         'batch':term.batch.name,
+        'batch_id':term.batch.id,
         'start_date':term.start_date,
         'end_date':term.end_date
         }
