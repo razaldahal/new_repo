@@ -6,6 +6,7 @@ from .serializers import *
 from rest_framework import filters,generics
 from django_filters.rest_framework import DjangoFilterBackend
 
+
 # Create your views here.
 class CategoryViewsets(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -167,55 +168,24 @@ class Book_returnViewsets(viewsets.ModelViewSet):
                 }
 
             output.append(temp)
-        return Response(output)                   
-class SearchView(viewsets.GenericViewSet):
-    queryset=Books.objects.all()
-    serializer_class = BooksSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('title','purchase_date','bill_no','isbn_no',
-    'no',
-    'title',
-    'author',
-    'edition',
-    'category__name',
-    'publisher',
-    'no_of_copies',
-    'shelf_no',
-    'position',
-    'book_condition')
-    def retrieve(self, request, pk=None):
-        pass
-    def list(self, request):
-        pass
+        return Response(output)
     
-   
+class SearchViewset(viewsets.ViewSet):
+    queryset=Books.objects.all()
+    def list(self,request):
+        r=request.GET
+        for k,v in self.queryset:
+            param=r.get(k)
+            b=Books.objects.filter(k=param)
+            if b.count()==1:
+                book=BooksSerilaizer(b[0])
+            else:
+                book=[]
+                for bk in b: 
+                    bd=BooksSerilaizer(bk)
+                    book.append(bd)
+        return Response(book)            
 
-
-        # val=[]
-        # ky=[]
-        # res=[]
-        # result=[]
-        # for key in keys:
-        #     a=qd.__getitem__(key)
-        #     b=key
-        #     val.append(a)
-        #     ky.append(b)
-        
-        # for k in ky:
-        #     for v in val:
-        #         r=Books.objects.filter(k__icontains=v)
-        #         s=r.count()
-        #         for t in range [0:(s-1)]:
-        #             book=r[t]
-        #             res.append(book)
-        #         result.append(res)
-        # return Response(result)                               
-
-
-
-
-
-            
 
          
 
