@@ -2,6 +2,7 @@ from django.db import models
 from teacher.models import Subject,Teacher
 from main.models import BaseModel
 from student.models import Student
+from Section.models import Section
 
 class School(BaseModel):
 	name = models.CharField(max_length=120)
@@ -24,6 +25,9 @@ class Course(BaseModel):
 	description = models.CharField(max_length=120)
 	code = models.CharField(max_length=16)
 	#syllabus_name=models.CharField(max_length=100)
+	
+
+	
 
 	def __str__(self):
 		return self.name
@@ -48,6 +52,9 @@ class SubjectAllocation(BaseModel):
 	batch=models.ForeignKey(Batch,on_delete=models.CASCADE)
 	subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
 	teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE)
+
+
+
 class ElectiveSubject(BaseModel):
 	course=models.ForeignKey(Course,on_delete=models.CASCADE)
 	batch=models.ForeignKey(Batch,on_delete=models.CASCADE)
@@ -56,5 +63,7 @@ class ElectiveSubject(BaseModel):
 class ClassTeacherAllocation(BaseModel):
 	course=models.ForeignKey(Course,on_delete=models.CASCADE)
 	batch=models.ForeignKey(Batch,on_delete=models.CASCADE)
+	section=models.ForeignKey(Section,on_delete=models.CASCADE)
 	class_teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE)
+	
 	

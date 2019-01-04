@@ -128,7 +128,6 @@ class ScheduleViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            s.name=data['name']
             s.term=Term.objects.get(id=data['term'])
             s.start_time=data['start_time']
             s.end_time=data['end_time']

@@ -226,7 +226,7 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response({'Detail':'Route not found!'},status=status.HTTP_404_NOT_FOUND)
         temp={
         'start_location':a.start_location,
-        'end_location':a.end_location,
+        'stop_location':a.stop_location,
         'start_time':a.start_time,
         'vehicle':a.vehicle.vehicle_no,
         'fee_amount':a.fee_amount

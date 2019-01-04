@@ -6,7 +6,7 @@ from main.models import BaseModel,User,Phone,Address
 class Teacher(BaseModel):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
 	qualification = models.CharField(max_length=120)
-
+	
 	def __str__(self):
 		return self.user.first_name+" "+self.user.last_name
 
@@ -16,7 +16,10 @@ class Subject(BaseModel):
 	name = models.CharField(max_length=120)
 	description = models.CharField(max_length=120)
 	code=models.CharField(max_length=15)
+
 	
+
+
 	def __str__(self):
 		return self.name
 

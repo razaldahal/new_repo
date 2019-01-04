@@ -64,9 +64,7 @@ class CourseViewSet(viewsets.ModelViewSet):
       
 
         else:
-    	    raise ValidationError({
-    		    'Detail':[serializer.errors]
-        		})
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self,request,pk):
         try:
@@ -186,7 +184,7 @@ class AssignSubjectViewset(viewsets.ModelViewSet):
         a=AssignSubject.objects.get(id=pk)
         if a:
             a.delete()
-            return Response('Deleted!')
+            return Response({'Detail':'Deleted!'},status=status.HTTP_204_NO_CONTENT)
         else:
             return Response('Not Found!',status=status.HTTP_404_NOT_FOUND)
     def  retrieve(self,requets,pk):
@@ -322,7 +320,7 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=ClassTeacherAllocation.objects.get_or_create(course=Course.objects.get(id=data['course']),batch=Batch.objects.get(id=data['batch']),class_teacher=Teacher.objects.get(id=data['class_teacher']))
+            a,b=ClassTeacherAllocation.objects.get_or_create(course=Course.objects.get(id=data['course']),batch=Batch.objects.get(id=data['batch']),class_teacher=Teacher.objects.get(id=data['class_teacher']),section=Section.objects.get(id=data['section']))
             if not b:
                 return Response({'Detail':'Already Allocated!'},status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -337,7 +335,8 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
             temp = {'id':obj.id,
             'course':obj.course.name,
             'batch':obj.batch.name,
-            'class_teacher':obj.class_teacher.user.first_name+" "+obj.class_teacher.user.last_name
+            'class_teacher':obj.class_teacher.user.first_name+" "+obj.class_teacher.user.last_name,
+            'section':obj.section._class+" "+obj.section.name
             }
             output.append(temp)
         return Response(output)

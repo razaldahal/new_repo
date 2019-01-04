@@ -181,12 +181,9 @@ class SubjectViewSet(viewsets.ModelViewSet):
 		return Response(data,status=status.HTTP_200_OK)
 	def delete(self,request,pk):
 		subject=Subject.objects.get(id=pk)
-		serializer=self.get_serializer(data=request.data)
-		if serializer.is_valid():
-			subject.delete()
-			return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
-		else:
-			return Respone({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+	
+		subject.delete()
+		return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
