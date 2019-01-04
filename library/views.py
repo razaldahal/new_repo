@@ -170,15 +170,26 @@ class Book_returnViewsets(viewsets.ModelViewSet):
 class SearchViewset(viewsets.ViewSet):
     queryset=Books.objects.all()
     def list(self,request):
-        qd=request.GET
-        keys=qd.keys()
-        print(keys)
-        values=qd.values()
-        print(values)
-        r=[]
-        for k,v in qd:
-            r=Books.objects.filter(k__icontains=v)
-        return Response(list(r))
+        r=request.GET
+        for k,v in self.queryset:
+            param=r.get(k)
+            b=Books.objects.filter(k=param)
+            if b.count()==1:
+                book=BooksSerilaizer(b[0])
+            else:
+                book=[]
+                for bk in b: 
+                    bd=BooksSerilaizer(bk)
+                    book.append(bd)
+        return Response(book)            
+
+
+            
+
+
+           
+        
+
 
 
 
