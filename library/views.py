@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework.response import Response
-from .models import *
-from .serializers import *
+from library.models import *
+from library.serializers import *
 from rest_framework import filters,generics
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -173,18 +173,45 @@ class Book_returnViewsets(viewsets.ModelViewSet):
 class SearchViewset(viewsets.ViewSet):
     queryset=Books.objects.all()
     def list(self,request):
+
+        # result = []
+        # params = {}
+
+        # if 'title' in request.GET:
+        #     params['title'] = request.GET['title']
+        
+        # if params:
+        #     books = Books.objects.filter(**params)
+        #     for book in books:
+        #         bd = BooksSerializer(book).data
+        #         result.append(bd)
+        # return Response(result)
+        
         r=request.GET
-        for k,v in self.queryset:
+        result=[]
+        qrs=self.queryset.values()
+        entery_list=[entry for entry in qrs]
+        for dct in entery_list:
+            s=set().union(dct.keys())
+        for k in s:
             param=r.get(k)
-            b=Books.objects.filter(k=param)
+            if not param:
+                continue
+               
+            keys={"{}".format(k):"{}".format(param)}   
+            b=Books.objects.filter(**keys)
             if b.count()==1:
-                book=BooksSerilaizer(b[0])
+                book=BooksSerializer(b[0]).data
+                
             else:
                 book=[]
                 for bk in b: 
-                    bd=BooksSerilaizer(bk)
-                    book.append(bd)
-        return Response(book)            
+                    bd=BooksSerializer(bk).data
+                    book.append(bd)    
+            result=book
+        return Response(result)    
+
+                    
 
 
          

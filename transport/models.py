@@ -50,5 +50,6 @@ class TransportAllocation(BaseModel):
     section=models.ForeignKey(Section,on_delete=models.CASCADE)
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     route=models.ForeignKey(Route,on_delete=models.CASCADE)
+  
 
 

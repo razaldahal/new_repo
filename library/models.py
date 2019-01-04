@@ -42,13 +42,13 @@ class Books(BaseModel):
 
 class Issue_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    user_type=models.CharField(max_length=15,choices=USER_TYPE)
+    user_type=models.IntegerField(choices=USER_TYPE)
     book=models.ForeignKey(Books,on_delete=models.CASCADE)
     issue_date=models.DateField()
     due_date=models.DateField() 
 class Request_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    user_type=models.CharField(max_length=15,choices=USER_TYPE)
+    user_type=models.IntegerField(choices=USER_TYPE)
     book=models.ForeignKey(Books,on_delete=models.CASCADE)
     request_date=models.DateField()
     status=models.CharField(max_length=10)
@@ -58,3 +58,6 @@ class Book_return(BaseModel):
     returned_date=models.DateField()
     fine_amount=models.IntegerField()
     remarks=models.TextField()
+    
+
+    

@@ -17,7 +17,9 @@ class UserBaseSerializer(serializers.Serializer):
 
 class UserSerializer(UserBaseSerializer):
 	gender = serializers.ChoiceField(choices=GENDER)
-	type = serializers.IntegerField(default=3)
+	type = serializers.ChoiceField(choices=USER_TYPE)
+	def get_type(self, obj):
+		return get_choice_string(USER_TYPE,obj.type)
 	
 	
 

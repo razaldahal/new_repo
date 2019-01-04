@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from library.models import *
 from main.models import User,USER_TYPE
 
 from main.helpers.tuple import get_choice_string
@@ -8,7 +8,7 @@ class CategorySerializer(serializers.Serializer):
     name=serializers.CharField()
     section_code=serializers.SlugField()
 
-class BooksSerilaizer(serializers.Serializer):
+class BooksSerializer(serializers.Serializer):
     purchase_date=serializers.DateField()
     bill_no=serializers.CharField()
     isbn_no=serializers.SlugField()
@@ -53,3 +53,4 @@ class Book_returnSerializer(serializers.Serializer):
     returned_date=serializers.DateField()
     fine_amount=serializers.IntegerField()
     remarks=serializers.CharField()
+    
