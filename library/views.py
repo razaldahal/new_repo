@@ -193,22 +193,24 @@ class SearchViewset(viewsets.ViewSet):
         entery_list=[entry for entry in qrs]
         for dct in entery_list:
             s=set().union(dct.keys())
-        for k in s:
-            param=r.get(k)
-            if not param:
-                continue
+        
+            for k in s:
+                param=r.get(k)
+                if not param:
+                    continue
                
-            keys={"{}".format(k):"{}".format(param)}   
-            b=Books.objects.filter(**keys)
-            if b.count()==1:
-                book=BooksSerializer(b[0]).data
+                keys={"{}".format(k):"{}".format(param)}   
+                b=Books.objects.filter(**keys)
+                if b.count()==1:
+                    book=BooksSerializer(b[0]).data
                 
-            else:
-                book=[]
-                for bk in b: 
-                    bd=BooksSerializer(bk).data
-                    book.append(bd)    
-            result=book
+                elif b.count()>1:
+                    book=[]
+                    for bk in b: 
+                        bd=BooksSerializer(bk).data
+                        book.append(bd)
+      
+                result=book
         return Response(result)    
 
                     

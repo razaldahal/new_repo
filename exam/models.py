@@ -2,6 +2,9 @@ from django.db import models
 from main.models import BaseModel
 from teacher.models import Subject,Teacher
 from course.models import Course,Batch
+from Class.models import Class
+from Section.models import Section
+from student.models import Student
 # Create your models here.
 
 
@@ -18,18 +21,15 @@ class Schedule(BaseModel):
     end_time=models.TimeField()
     date=models.DateField()
 
-# EXAM_TYPE =(
-# 	('CLASS_TEST',1),
-# 	('FIRST_TERMINAL',2),
-# 	('SECOND_TERMINAL',3),
-# 	('PRE_BOARD',4),
-# 	('BOARD',5)
-# 	)
-
-# class Test(BaseModel):
-# 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
-# 	date = models.DateField()
-# 	type = models.IntegerField(choices=EXAM_TYPE)
-# 	full_marks = models.IntegerField()
-# 	pass_marks = models.IntegerField()
+class Marks(BaseModel):
+    _class=models.ForeignKey(Class,on_delete=models.CASCADE)
+    section=models.ForeignKey(Section,on_delete=models.CASCADE)
+    subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
+    exam=models.ForeignKey(Term,on_delete=models.CASCADE)
+    theory_fm=models.IntegerField()
+    theory_pm=models.IntegerField()
+    practical_fm=models.IntegerField()
+    practical_pm=models.IntegerField()
+    full_marks=models.IntegerField()
+    pass_marks=models.IntegerField()
 

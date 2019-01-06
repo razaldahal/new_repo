@@ -25,7 +25,9 @@ class Course(BaseModel):
 	description = models.CharField(max_length=120)
 	code = models.CharField(max_length=16)
 	#syllabus_name=models.CharField(max_length=100)
-	
+	class Meta:
+
+		db_table='course'
 
 	
 

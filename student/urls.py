@@ -6,7 +6,7 @@ from student import views
 router = routers.DefaultRouter()
 router.register('assignment',views.StudentAssignmentViewSt)
 router.register('test',views.TestStudentViewSet)
-router.register('',views.StudentGetViewSet)
+router.register('get',views.StudentGetViewSet)
 
 
 urlpatterns = [

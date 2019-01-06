@@ -29,7 +29,7 @@ class DepartmentViewset(viewsets.ModelViewSet):
             Department.objects.get_or_create(school=School.objects.get(id=data['school']),name=data['name'],description=data['description'])
             return Response(data)
         else:
-            raise ValidationError({'Detail':[serializer.errors]})
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
                 
 
@@ -75,7 +75,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             'name':instance.name,
             'description':instance.description,
             'code':instance.code,
-            'department':instance.department.name
+            'department':instance.department#.name
         }
         return Response(dict)
 

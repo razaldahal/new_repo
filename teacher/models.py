@@ -44,3 +44,4 @@ class Test(BaseModel):
 	type = models.IntegerField(choices=EXAM_TYPE)
 	full_marks = models.IntegerField()
 	pass_marks = models.IntegerField()
+	

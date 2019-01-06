@@ -145,3 +145,58 @@ class ScheduleViewset(viewsets.ModelViewSet):
             return Response({'Detail':'Schedule not found'},status=status.HTTP_404_NOT_FOUND)
         s.delete()
         return Response({'Success!':'Deleted'},status=status.HTTP_204_NO_CONTENT)         
+
+
+class AddMarksViewSet(viewsets.ModelViewSet):
+    queryset=Marks.objects.all()
+    serializer_class=MarksSerializer
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=Marks.objects.get_or_create(_class=Class.objects.get(id=data['_class']),section=Section.objects.get(id=data['section']),subject=Subject.objects.get(id=data['subject']),theory_fm=data['theory_fm'],theory_pm=data['theory_pm'],practical_fm=data['practical_fm'],practical_pm=data['practical_pm'],full_marks=data['theory_fm']+data['practical_fm'],pass_marks=data['theory_pm']+data['practical_pm'])
+            if not b:
+                return Response({'Detail':'Marks alredy added!'},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objects:
+
+            temp={'id':obj.id,
+            'class':obj._class.name,
+            'section':obj.section.name,
+            'subject':obj.subject.name,
+            'theory_fm':obj.theory_fm,
+            'theory_pm':obj.theory_pm,
+            'practical_fm':obj.practical_fm,
+            'practical_pm':obj.practical_pm,
+            'full_marks':obj.full_marks,
+            'pass_marks':obj.pass_marks
+            }
+            output.append(temp)
+        return Response(output)    
+    def retrieve(self,request,pk):
+        try:
+            obj=Marks.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Not found!'},status=status.HTTP_404_NOT_FOUND)
+        temp={'id':obj.id,
+            'class':obj._class.name,
+            'section':obj.section.name,
+            'subject':obj.subject.name,
+            'theory_fm':obj.theory_fm,
+            'theory_pm':obj.theory_pm,
+            'practical_fm':obj.practical_fm,
+            'practical_pm':obj.practical_pm,
+            'full_marks':obj.full_marks,
+            'pass_marks':obj.pass_marks
+            }
+        return Response(temp)
+    def update(self,req)        
+
