@@ -6,6 +6,23 @@ from .models import *
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 
+class EventTypeViewSet(viewsets.ModelViewSet):
+    queryset=EventType.objects.all()
+    def create(self,request):
+        data=request.data
+        a,b=EventType.objects.get_or_create(data)
+        if not b:
+            return Response({'Detail':'Already exists!'},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(data,status=status.HTTP_201_CREATED)
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        for obj in objects:
+            temp={'name':obj.name}
+            output.append(temp)
+        return Response(output)            
+
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -16,7 +33,7 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=Event.objects.get_or_create(name=data['name'],description=data['description'],manager=Teacher.objects.get(id=data['manager']),progress=data['progress'],status=data['status'],date_start=data['date_start'],date_end=data['date_end'])
+            a,b=Event.objects.get_or_create(type=EventType.objects.get(id=data['type']),name=data['name'],description=data['description'],manager=Teacher.objects.get(id=data['manager']),progress=data['progress'],status=data['status'],date_start=data['date_start'],date_end=data['date_end'])
             if not b:
                 return Response({'Detail':'Event already exists'},status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -28,7 +45,10 @@ class EventViewSet(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'name':obj.name,
+
+            temp={'id':obj.id,
+            'type':obj.type.name,
+            'name':obj.name,
             'description':obj.description,
             'progress':obj.progress,
             'manager':obj.manager.user.first_name+" "+obj.manager.user.last_name,
@@ -38,14 +58,14 @@ class EventViewSet(viewsets.ModelViewSet):
             }
             output.append(temp)
 
-        return Response(temp)
+        return Response(output)
 
     def retrieve(self,request,pk):
         try:
             obj=Event.objects.get(id=pk)
         except:
             return Response({'Detail':'Event not Found!'},status=status.HTTP_404_NOT_FOUND)
-        temp={'id':obj.id,
+        temp={'type':obj.type.name,
             'name':obj.name,
             'description':obj.description,
             'progress':obj.progress,
@@ -64,6 +84,7 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
+            obj.type=EvnetType.objects.get(id=data['type'])
             obj.name=data['name']
             obj.description=data['description']
             obj.progress=data['progress']

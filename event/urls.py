@@ -4,7 +4,8 @@ from django.urls import include,path
 
 router=DefaultRouter()
 
-router.register('',views.EventViewSet)
+router.register('event',views.EventViewSet)
+router.register('type',views.EventTypeViewSet)
 
 
 

@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 
 class EventSerializer(serializers.Serializer):
+    type=serializers.PrimaryKeyRelatedField(queryset=EventType.objects.all())
     name=serializers.CharField()
     description=serializers.CharField()
     manager=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())

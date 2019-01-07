@@ -12,4 +12,4 @@ router.register(r'search',views.SearchViewset)
 urlpatterns = [
 	path('',include(router.urls)),
 
-	]
+]

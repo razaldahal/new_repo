@@ -3,8 +3,10 @@ from main.models import BaseModel
 from teacher.models import Teacher
 # Create your models here.
 
-
+class EventType(BaseModel):
+    name=models.CharField(max_length=100)
 class Event(BaseModel):
+    type=models.ForeignKey(EventType,on_delete=models.CASCADE)
     name=models.CharField(max_length=50)
     description=models.CharField(max_length=100)
     progress=models.FloatField()  
@@ -19,5 +21,6 @@ class EventTask(BaseModel):
     name=models.CharField(max_length=50)
     status=models.CharField(max_length=50)
     description=models.CharField(max_length=100)
+    
 
     

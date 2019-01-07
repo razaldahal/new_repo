@@ -16,10 +16,6 @@ class Subject(BaseModel):
 	name = models.CharField(max_length=120)
 	description = models.CharField(max_length=120)
 	code=models.CharField(max_length=15)
-
-	
-
-
 	def __str__(self):
 		return self.name
 

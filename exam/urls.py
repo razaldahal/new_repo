@@ -6,7 +6,8 @@ router=DefaultRouter()
 
 router.register('term',views.TermViewset)
 router.register('schedule',views.ScheduleViewset)
-
+router.register('addmarks',views.AddMarksViewSet)
+router.register('studentmarks',views.StudentmarksViewSet)
 
 
 

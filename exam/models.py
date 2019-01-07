@@ -33,3 +33,9 @@ class Marks(BaseModel):
     full_marks=models.IntegerField()
     pass_marks=models.IntegerField()
 
+class Studentmarks(BaseModel):
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)
+    marks=models.ForeignKey(Marks,on_delete=models.CASCADE)
+    obtained_theory_marks=models.IntegerField()
+    obtained_practical_marks=models.IntegerField()
+    
