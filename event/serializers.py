@@ -1,7 +1,8 @@
 from .models import *
 from rest_framework import serializers
 
-
+class EventTypeserializer(serializers.Serializer):
+    name=serializers.CharField()
 class EventSerializer(serializers.Serializer):
     type=serializers.PrimaryKeyRelatedField(queryset=EventType.objects.all())
     name=serializers.CharField()

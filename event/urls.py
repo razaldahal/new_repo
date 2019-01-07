@@ -6,6 +6,7 @@ router=DefaultRouter()
 
 router.register('event',views.EventViewSet)
 router.register('type',views.EventTypeViewSet)
+router.register('task',views.EventTaskViewset)
 
 
 

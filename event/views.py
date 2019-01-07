@@ -8,18 +8,25 @@ from rest_framework.response import Response
 
 class EventTypeViewSet(viewsets.ModelViewSet):
     queryset=EventType.objects.all()
+    serializer_class=EventTypeserializer
     def create(self,request):
-        data=request.data
-        a,b=EventType.objects.get_or_create(data)
-        if not b:
-            return Response({'Detail':'Already exists!'},status=status.HTTP_400_BAD_REQUEST)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+
+            data=request.data
+            a,b=EventType.objects.get_or_create(data)
+            if not b:
+                return Response({'Detail':'Already exists!'},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response(data,status=status.HTTP_201_CREATED)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)        
     def list(self,request):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'name':obj.name}
+            temp={'id':obj.id,
+                'name':obj.name}
             output.append(temp)
         return Response(output)            
 
