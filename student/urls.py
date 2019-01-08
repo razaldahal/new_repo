@@ -1,14 +1,21 @@
 from django.urls import path,include
+from django.conf.urls import url
+from django.conf.urls import url
 from rest_framework import routers
+from rest_framework_nested import routers
 
-from student import views
 
-router = routers.DefaultRouter()
-router.register('assignment',views.StudentAssignmentViewSt)
-router.register('test',views.TestStudentViewSet)
-router.register('',views.StudentGetViewSet)
+from .views import *
+
+router = routers.SimpleRouter()
+
+router.register(r'admission', StudentAdmissionViewSet)
+router.register(r'', StudentViewSet)
 
 
 urlpatterns = [
-	path('',include(router.urls))
+	url(r'search', StudentSearchViewSet.as_view(), name='student-search'),
+
+	url(r'^', include(router.urls)),
+
 ]

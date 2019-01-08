@@ -40,23 +40,29 @@ INSTALLED_APPS = [
     #3rd party
     'corsheaders',
     'rest_framework',
+
+    'drf_yasg',
+
     'main',
-    'admission',
-    'course',
-    'guardian',
+    'api',
+    'academic',
     'student',
-    'Class',
-    'Section',
-    'teacher',
-    'assignment',
-    'message',
-    'accountant',
-    'library',
-    'academics',
-    'transport',
     'dashboard',
-    'event',
-    'exam'
+
+    #'admission',
+    #'course',
+    # 'guardian',
+    # 'student',
+    # 'teacher',
+    # 'assignment',
+    # 'message',
+    # 'accountant',
+    # 'library',
+    # 'academics',
+    # 'transport',
+    # 'dashboard',
+    # 'event',
+    # 'exam'
 ]
 
 MIDDLEWARE = [
@@ -156,4 +162,15 @@ REST_FRAMEWORK = {
 }
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
+}
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
 }
