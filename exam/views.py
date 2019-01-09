@@ -7,6 +7,8 @@ from .models import *
 from .serializers import *
 import datetime
 from datetime import date,time
+from Class.serializers import ClassSerializer
+from Section.serializers import SectionSerializer
 
 class TermViewset(viewsets.ModelViewSet):
     queryset=Term.objects.all()
@@ -229,6 +231,12 @@ class StudentmarksViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
+
+
+
+
+
+
             a,b=Studentmarks.objects.get_or_create(student=Student.objects.get(id=data['student']),marks=Marks.objects.get(id=data['marks']),obtained_theory_marks=data['obtained_theory_marks'],obtained_practical_marks=data['obtained_practical_marks'])
             if not b:
                 return Response({'Detail':'Stduent_Marks already added!'},status=status.HTTP_400_BAD_REQUEST)
@@ -318,5 +326,180 @@ class StudentmarksViewSet(viewsets.ModelViewSet):
             obj.save()
             return Response(data,status=status.HTTP_200_OK)
         else:
-            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)           
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)  
 
+
+class SectionsubjectViewSet(viewsets.ModelViewSet):
+	queryset=Sectionsubject.objects.all()
+	serializer_class=SectionsubjectSerializer
+	def create(self,request):
+		serializer=self.get_serializer(data=request.data)
+		if serializer.is_valid():
+			data=serializer.data
+			a,b=Sectionsubject.objects.get_or_create(section=Section.objects.get(id=data['section']),subject=Subjects.objects.get(id=data['subject']))
+			if not b:
+				return Response({'Detail':'Section_Subject Already Exists'},status=status.HTTP_400_BAD_REQUEST)
+			else:
+				return Response(data,status=status.HTTP_201_CREATED)
+		else:
+			return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+
+	def list(self,request):
+		objects=self.queryset
+		output=[]
+
+		for obj in objects:
+			temp={'id':obj.id,
+			'class':obj.section._class.name,
+			'section':obj.section.name,
+			'subject':obj.subject.name
+			}
+			output.append(temp)
+
+		return Response(output)
+
+	def update(self,request,pk):
+		try:
+			ss=Sectionsubject.objects.get(id=pk)
+		except:
+			return Response({'Detail':'Sectionsubject not found!'},status=status.HTTP_404_NOT_FOUND)
+		serializer=self.get_serializer(data=request.data)
+		if serializer.is_valid():
+			data=serializer.data
+			ss.section=Section.objects.get(id=data['section'])
+			ss.subject=Subject.objects.get(id=data['subject'])
+			ss.save()
+			return Response(data,status=status.HTTP_200_OK)
+	def retrieve(self,request,pk):
+		try:
+			obj=Sectionsubject.objects.get(id=pk)
+		except:
+			return Response({'Detail':'Section Subject not found!'},status=status.HTTP_404_NOT_FOUND)
+		temp={
+			'class':obj.section._class.name,
+			'section':obj.section.name,
+			'subject':obj.subject.name
+			}
+		return Response(temp)				                 
+
+class CourseClassViewSet(viewsets.ModelViewSet):
+    queryset = Class.objects.filter().order_by('-date_created')
+    serializer_class = ClassSerializer
+    
+    http_method_names = ['get', 'post', 'delete']
+
+
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        if self.request.method == 'POST':
+            serializer_class = ClassSerializer
+        return serializer_class(*args, **kwargs)
+
+    def list(self, request, course_pk, pk=None):
+        queryset = self.queryset.filter(course_id=course_pk).all()
+        output = self.get_serializer(queryset, many=True).data
+        return Response(output)
+
+
+    def create(self,request, course_pk):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            course = False
+            try:
+                course = Course.objects.get(id=course_pk)
+            except:
+                raise serializers.ValidationError({'Detail':['No such course']})
+            else:
+
+                _class, c = Class.objects.get_or_create(course=course, name=data['name'], defaults={'description':data['description']})
+                if not c:
+                    raise serializers.ValidationError({'Detail': ['{} class already exists'.format(_class.name)]})
+
+                data = ClassSerializer(_class).data
+                return Response(data)
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+
+class ClassSectionViewSet(viewsets.ModelViewSet):
+    queryset = Section.objects.filter().order_by('-date_created')
+    serializer_class = SectionSerializer
+    
+    http_method_names = ['get', 'post', 'delete']
+
+
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        if self.request.method == 'POST':
+            serializer_class = SectionSerializer
+        return serializer_class(*args, **kwargs)
+
+    def list(self, request, class_pk, pk=None):
+        queryset = self.queryset.filter(_class_id=class_pk).all()
+        output = self.get_serializer(queryset, many=True).data
+        return Response(output)
+
+
+    def create(self,request, class_pk):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            _class = False
+            try:
+                _class = Class.objects.get(id=class_pk)
+            except:
+                raise serializers.ValidationError({'Detail':['No such class']})
+            else:
+
+                section, c = Section.objects.get_or_create(_class=_class, name=data['name'])
+                if not c:
+                    raise serializers.ValidationError({'Detail': ['{} section already exists'.format(section.name)]})
+
+                data = SectionSerializer(section).data
+                return Response(data)
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+
+
+class SectionsubjectViewSet(viewsets.ModelViewSet):
+
+    queryset=Sectionsubject.objects.all()
+    serializer_class=SectionsubjectSerializer
+
+    http_method_names = ['get', 'post', 'delete']
+
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        if self.request.method == 'POST':
+            serializer_class = SectionSubjectSerializer
+        return serializer_class(*args, **kwargs)
+
+    def list(self, request, section_pk, pk=None):
+        queryset = self.queryset.filter(section_id=section_pk).all()
+        output = self.get_serializer(queryset, many=True).data
+        return Response(output)
+
+    def create(self,request,section_pk):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            section = False
+            try:
+                section = Section.objects.get(id=section_pk)
+            except:
+                raise serializers.ValidationError({'Detail':['No such section']})
+            else:
+
+                ssubject, c = SectionSubject.objects.get_or_create(section=section, name=data['subject']['name'],code=data['subject']['code'],description=data['subject']['description'])
+                if not c:
+                    raise serializers.ValidationError({'Detail': ['{} subject object already exists'.format(ssubject.subject.name)]})
+
+                data = SectionSubjectSerializer(ssubject).data
+                return Response(data)
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})

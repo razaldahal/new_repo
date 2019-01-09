@@ -1,5 +1,6 @@
 from django.db import models
 from main.models import BaseModel,User,Phone,Address
+
 #from course.models import Course,Batch
 #from student.models import Student
 
@@ -18,7 +19,6 @@ class Subject(BaseModel):
 	code=models.CharField(max_length=15)
 	def __str__(self):
 		return self.name
-
 
 class Resources(BaseModel):
 	teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)

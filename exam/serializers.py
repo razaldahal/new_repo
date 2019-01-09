@@ -29,3 +29,7 @@ class StudentmarksSerializer(serializers.Serializer):
     marks=serializers.PrimaryKeyRelatedField(queryset=Marks.objects.all())
     obtained_theory_marks=serializers.IntegerField()
     obtained_practical_marks=serializers.IntegerField()
+
+class SectionsubjectSerializer(serializers.Serializer):
+	section=serializers.PrimaryKeyRelatedField(queryset=Section.objects.all())
+	subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())

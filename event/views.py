@@ -10,11 +10,12 @@ class EventTypeViewSet(viewsets.ModelViewSet):
     queryset=EventType.objects.all()
     serializer_class=EventTypeserializer
     def create(self,request):
+        print(request.data)
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
 
             data=request.data
-            a,b=EventType.objects.get_or_create(data)
+            a,b=EventType.objects.get_or_create(name=data['name'])
             if not b:
                 return Response({'Detail':'Already exists!'},status=status.HTTP_400_BAD_REQUEST)
             else:

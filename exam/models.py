@@ -39,3 +39,6 @@ class Studentmarks(BaseModel):
     obtained_theory_marks=models.IntegerField()
     obtained_practical_marks=models.IntegerField()
     
+class Sectionsubject(BaseModel):
+	section=models.ForeignKey(Section,on_delete=models.CASCADE)
+	subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
