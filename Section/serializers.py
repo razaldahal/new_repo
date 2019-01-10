@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 class SectionSerializer(serializers.Serializer):
-	_class =  serializers.IntegerField()
+	_class_id =  serializers.IntegerField()
 	name = serializers.CharField()
 
 class SectionStudentSerializer(serializers.Serializer):

@@ -99,7 +99,8 @@ class Issue_bookViewset(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'book_no':obj.book.no,
+            temp={'id':obj.id,
+                'book_no':obj.book.no,
                   'user':obj.user.first_name,
                   'user_type':obj.user_type,
                   'title':obj.book.title,

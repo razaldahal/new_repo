@@ -23,13 +23,14 @@ class_router.register(r'section', ClassSectionViewSet, base_name='class-section'
 
 section_router=routers.NestedSimpleRouter(router,r'section',lookup='section')
 section_router.register(r'subject',SectionsubjectViewSet,base_name='section-subject')
+section_router.register(r'student',SectionstdViewSet,base_name='section-student')
 
-router=DefaultRouter()
+
 router.register('term',views.TermViewset)
 router.register('schedule',views.ScheduleViewset)
 router.register('addmarks',views.AddMarksViewSet)
 router.register('studentmarks',views.StudentmarksViewSet)
-
+router.register('sectionsubject',views.SectionSubjectViewSet)
 urlpatterns = [
 	path('',include(class_router.urls)),
 	path('',include(course_router.urls)),

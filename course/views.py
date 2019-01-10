@@ -336,7 +336,7 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
             'course':obj.course.name,
             'batch':obj.batch.name,
             'class_teacher':obj.class_teacher.user.first_name+" "+obj.class_teacher.user.last_name,
-            'section':obj.section._class+" "+obj.section.name
+            'section':obj.section._class.name+" "+obj.section.name
             }
             output.append(temp)
         return Response(output)
