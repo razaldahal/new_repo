@@ -7,7 +7,7 @@ from .models import *
 from .serializers import *
 import datetime
 from datetime import date,time
-from Class.serializers import ClassSerializer
+
 from Section.serializers import SectionSerializer,SectionStudentSerializer
 from Section.models import SectionStudent
 
@@ -394,11 +394,11 @@ class CourseClassViewSet(viewsets.ModelViewSet):
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         if self.request.method == 'POST':
-            serializer_class = ClassSerializer
+            serializer_class = ClassPostSerializer
         return serializer_class(*args, **kwargs)
 
     def list(self, request, course_pk, pk=None):
-        queryset = self.queryset.filter(id=course_pk).all()
+        queryset = self.queryset.filter(course_id=course_pk).all()
         output = self.get_serializer(queryset, many=True).data
         return Response(output)
 
@@ -456,7 +456,7 @@ class ClassSectionViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError({'Detail':['No such class']})
             else:
 
-                section, c = Section.objects.get_or_create(_class=_class, name=data['name'])
+                section, c = Section.objects.get_or_create(_class_id=_class.id, name=data['name'])
                 if not c:
                     raise serializers.ValidationError({'Detail': ['{} section already exists'.format(section.name)]})
 
@@ -497,7 +497,7 @@ class SectionsubjectViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError({'Detail':['No such section']})
             else:
 
-                ssubject, c = Sectionsubject.objects.get_or_create(section=section, name=data['subject']['name'],code=data['subject']['code'],description=data['subject']['description'])
+                ssubject, c = Sectionsubject.objects.get_or_create(section=section, subject=Subject.objects.get(id=data['subject']))
                 if not c:
                     raise serializers.ValidationError({'Detail': ['{} subject object already exists'.format(ssubject.subject.name)]})
 
@@ -523,7 +523,7 @@ class SectionstdViewSet(viewsets.ModelViewSet):
 
     def list(self, request, section_pk, pk=None):
         queryset = self.queryset.filter(section_id=section_pk).all()
-        output = self.get_serializer(queryset, many=True).data
+        output = self.get_serializer(queryset, many=True).data        
         return Response(output)
 
     def create(self,request,section_pk):
@@ -537,7 +537,7 @@ class SectionstdViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError({'Detail':['No such section']})
             else:
 
-                sstd, c = SectionStudent.objects.get_or_create(section=section,student=Student.objects.get(id=data['student_id']))
+                sstd, c = SectionStudent.objects.get_or_create(section=section,student=Student.objects.get(id=data['student_id']),roll_no=data['roll_no'])
                 if not c:
                     raise serializers.ValidationError({'Detail': ['{} subject object already exists'.format(sstd.student.user.first_name)]})
 

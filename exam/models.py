@@ -42,3 +42,17 @@ class Studentmarks(BaseModel):
 class Sectionsubject(BaseModel):
 	section=models.ForeignKey(Section,on_delete=models.CASCADE)
 	subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
+
+
+class Class(BaseModel):
+    course = models.ForeignKey(Course,on_delete=models.CASCADE)
+    name = models.CharField(max_length=11)
+    description = models.TextField()
+
+    class Meta:
+        db_table = 'exam_class'
+        verbose_name_plural = "Class"
+
+
+    def __str__(self):
+        return self.name

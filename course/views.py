@@ -366,3 +366,4 @@ class  ClassTeacherAllocationViewSet(viewsets.ModelViewSet):
         'batch':ct.batch.name,
         'class_teacher':ct.class_teacher.user.first_name+" "+ct.class_teacher.user.last_name}
         return Response(temp,status=status.HTTP_200_OK)    
+

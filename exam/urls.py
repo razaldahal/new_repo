@@ -31,6 +31,7 @@ router.register('schedule',views.ScheduleViewset)
 router.register('addmarks',views.AddMarksViewSet)
 router.register('studentmarks',views.StudentmarksViewSet)
 router.register('sectionsubject',views.SectionSubjectViewSet)
+router.register('sectionstudent',views.SectionstdViewSet)
 urlpatterns = [
 	path('',include(class_router.urls)),
 	path('',include(course_router.urls)),

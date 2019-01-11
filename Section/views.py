@@ -31,7 +31,7 @@ class SectionViewSet(viewsets.ModelViewSet):
     	if serializer.is_valid():
     		data = serializer.data
     		created, bv = Section.objects.get_or_create(
-                    _class_id=data['_class'],
+                    _class_id=data['_class_id'],
                     name=data['name']
             	)
     		if not bv:

@@ -42,9 +42,9 @@ class BooksViewset(viewsets.ModelViewSet):
     serializer_class=BooksSerializer
 
     def create(self,request):
-        serilaizer=self.get_serializer(data=request.data)
-        if serilaizer.is_valid():
-            data=serilaizer.data 
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data 
             a,b=Books.objects.get_or_create(purchase_date=data['purchase_date'],
             bill_no=data['bill_no'],
             isbn_no=data['isbn_no'],
@@ -64,7 +64,7 @@ class BooksViewset(viewsets.ModelViewSet):
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
-            return Response({'Detail':[serilaizer.errors]},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 
                    
     def list(self,request):
@@ -153,7 +153,7 @@ class Book_returnViewsets(viewsets.ModelViewSet):
             else:
                 return Response('Book return successful')
         else:
-            return Response(serilaizer.errors)
+            return Response(serializer.errors)
     def list(self,request):
         objects=self.queryset
         output=[]

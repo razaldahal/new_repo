@@ -33,3 +33,14 @@ class StudentmarksSerializer(serializers.Serializer):
 class SectionsubjectSerializer(serializers.Serializer):
 	section=serializers.PrimaryKeyRelatedField(queryset=Section.objects.all())
 	subject=serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
+
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ('id','name', 'description')
+   
+class ClassPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ('name', 'description',)    
