@@ -11,6 +11,7 @@ class Student(BaseModel):
 		return self.user.first_name+" "+self.user.last_name
 
 from Section.models import SectionStudent
+
 class TestStudent(BaseModel):
 	section_student = models.ForeignKey(SectionStudent,on_delete=models.CASCADE)
 	test = models.ForeignKey(Test,on_delete=models.CASCADE)

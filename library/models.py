@@ -14,7 +14,7 @@ class Category(BaseModel):
 class Books(BaseModel):
     purchase_date=models.DateField()
     bill_no=models.CharField(max_length=20)
-    isbn_no=models.SlugField()
+    isbn_no=models.CharField(max_length=20)
     no=models.CharField(max_length=20)
     title=models.CharField(max_length=30)
     author=models.CharField(max_length=30)
@@ -42,10 +42,11 @@ class Books(BaseModel):
 
 class Issue_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    user_type=models.IntegerField(choices=USER_TYPE)
+   # user_type=models.IntegerField(choices=USER_TYPE)
     book=models.ForeignKey(Books,on_delete=models.CASCADE)
     issue_date=models.DateField()
     due_date=models.DateField() 
+
 class Request_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     user_type=models.IntegerField(choices=USER_TYPE)

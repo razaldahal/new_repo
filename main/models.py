@@ -5,6 +5,7 @@ from django.contrib.contenttypes import fields
 from django import forms
 from rest_framework.decorators import api_view
 from .helpers.tuple import get_choice_string
+
 class BaseModel(models.Model):
 	date_created = models.DateField(auto_now_add=True)
 	date_updated = models.DateField(auto_now=True)
@@ -31,8 +32,9 @@ GENDER =(
 	)
 
 class User(BaseModel, AbstractUser):
-	type = models.IntegerField(choices=USER_TYPE,null=True)
-	gender = models.IntegerField(choices=GENDER ,null=True)
+	type = models.IntegerField(choices=USER_TYPE,null=True,blank=True)
+	gender = models.IntegerField(choices=GENDER ,null=True ,blank=True)
+	
 	
 	
 TYPE =(

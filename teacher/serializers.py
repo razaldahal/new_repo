@@ -57,7 +57,7 @@ class ResourceDetailSerializer(serializers.Serializer):
 class TestSerializer(serializers.Serializer):
 	teacher_id = serializers.IntegerField()
 	date = serializers.DateField()
-	type = serializers.IntegerField()
+	type = serializers.IntegerField(required=False)
 	full_marks = serializers.IntegerField()
 	pass_marks = serializers.IntegerField()
   

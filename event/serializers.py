@@ -13,9 +13,16 @@ class EventSerializer(serializers.Serializer):
     progress=serializers.FloatField()
     status=serializers.CharField()
 
-class EevntTaskSerializer(serializers.Serializer):
-    event=serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+class EventTaskSerializer(serializers.Serializer):
+    event = serializers.IntegerField()
     name=serializers.CharField()
     description=serializers.CharField()
     status=serializers.CharField()
+    priority = serializers.IntegerField()
+    date = serializers.DateField()
+    user = serializers.IntegerField()
+    student = serializers.IntegerField()
 
+
+
+    

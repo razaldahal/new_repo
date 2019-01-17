@@ -11,7 +11,7 @@ class CategorySerializer(serializers.Serializer):
 class BooksSerializer(serializers.Serializer):
     purchase_date=serializers.DateField()
     bill_no=serializers.CharField()
-    isbn_no=serializers.SlugField()
+    isbn_no=serializers.IntegerField()
     no=serializers.CharField()
     title=serializers.CharField()
     author=serializers.CharField()
@@ -35,12 +35,16 @@ class BooksSerializer(serializers.Serializer):
     book_condition=serializers.ChoiceField(choices=book_condition_c)
     def get_book_condition(self, obj):
         return get_choice_string(book_condition_c,obj.book_condition)
+
 class Issue_bookSerilaizer(serializers.Serializer):
-    user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    user_type=serializers.ChoiceField(choices=USER_TYPE)
-    book=serializers.PrimaryKeyRelatedField(queryset=Books.objects.all())
+   # user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.IntegerField()
+   # user_type=serializers.ChoiceField(choices=USER_TYPE)
+    #book=serializers.PrimaryKeyRelatedField(queryset=Books.objects.all())
+    book = serializers.IntegerField()
     issue_date=serializers.DateField()
     due_date=serializers.DateField() 
+
 class Request_bookSerializer(serializers.Serializer):
     user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     user_type=serializers.ChoiceField(choices=USER_TYPE)

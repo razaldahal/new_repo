@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from library.models import *
 from library.serializers import *
 from rest_framework import filters,generics
-from django_filters.rest_framework import DjangoFilterBackend
+#from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.
@@ -87,11 +87,33 @@ class Issue_bookViewset(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=Issue_book.objects.get_or_create(user=User.objects.get(id=data['user']),user_type=data['user_type'],issue_date=data['issue_date'],due_date=data['due_date'],book=Books.objects.get(id=data['book']))
-            if not b:
-                return Response({'Detail':'Book already issued'},status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({'Success!':'Book issued successfully'},status=status.HTTP_201_CREATED)
+            user = data['user']
+            
+            try:
+                _user_id = User.objects.filter(pk=user)
+                #print(_user_id)
+            except:
+                return Response({"Detail":[" User Not  Exist With This id"]},
+                status=status.HTTP_400_BAD_REQUEST)
+            try:
+                _book = Books.objects.filter(id=data['book'])
+            except:
+                return Response({"Detail":["Book Not Exist"]},
+                status=status.HTTP_400_BAD_REQUEST)
+
+            if _user_id and _book:
+                print(_user_id)
+                a,b=Issue_book.objects.get_or_create(user_id=user,
+                                                    book_id=data['book'],
+                                                    defaults = {
+                                                    'issue_date':data['issue_date'],
+                                                    'due_date':data['due_date'],
+                                                    })
+                if not b:
+                    return Response({'Detail':'Book already issued'},status=status.HTTP_400_BAD_REQUEST)
+                
+            return Response({'Success!':'Book issued successfully'},status=status.HTTP_201_CREATED)
+          
         else:
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
 

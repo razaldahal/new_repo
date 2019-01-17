@@ -19,8 +19,15 @@ from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
 
+#swagger
+from django.conf.urls import url
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Pastebin API')
+
 
 urlpatterns = [
+     url(r'^$', schema_view),
     path('admin/', admin.site.urls),
     path('api/library/',include('library.urls')),
     path('api/accountant/',include('accountant.urls')),
