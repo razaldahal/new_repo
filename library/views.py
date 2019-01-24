@@ -5,8 +5,8 @@ from library.models import *
 from library.serializers import *
 from rest_framework import filters,generics
 #from django_filters.rest_framework import DjangoFilterBackend
-
-
+from main.helpers.tuple import get_choice_string
+from student.models import Student
 # Create your views here.
 class CategoryViewsets(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -75,6 +75,9 @@ class BooksViewset(viewsets.ModelViewSet):
                 'book_no':obj.no,
                   'book_isbn_no':obj.isbn_no,
                   'title': obj.title,
+                  'author':obj.author,
+                  'edition':obj.edition,
+                  'category':obj.category.name
                   }
             output.append(temp)
         return Response(output)
@@ -103,7 +106,7 @@ class Issue_bookViewset(viewsets.ModelViewSet):
 
             if _user_id and _book:
                 print(_user_id)
-                a,b=Issue_book.objects.get_or_create(user_id=user,
+                a,b=Issue_book.objects.get_or_create(user_id=data['user'],
                                                     book_id=data['book'],
                                                     defaults = {
                                                     'issue_date':data['issue_date'],
@@ -122,15 +125,30 @@ class Issue_bookViewset(viewsets.ModelViewSet):
         output=[]
         for obj in objects:
             temp={'id':obj.id,
-                'book_no':obj.book.no,
-                  'user':obj.user.first_name,
-                  'user_type':obj.user_type,
+                'book_isbn_no':obj.book.isbn_no,
+                  'user':obj.user.first_name+" "+obj.user.last_name,
+                  'user_type':obj.user.type,
                   'title':obj.book.title,
                   'issue_date':obj.issue_date,
                   'due_date':obj.due_date,
                   }
             output.append(temp)
-        return Response(output)              
+        return Response(output) 
+    def retrieve(self,request,pk):
+        try:
+            obj=Issue_book.objects.get(id=pk)
+        except:
+            return Response({"Detail":"No such book issue object found"},status=status.HTTP_404_NOT_FOUND)
+        temp={'id':obj.id,
+            'book_no':obj.book.no,
+                'user':obj.user.first_name+" "+obj.user.last_name,
+                'user_type':obj.user.type,
+                'title':obj.book.title,
+                'issue_date':obj.issue_date,
+                'due_date':obj.due_date,
+                }
+        return Response(temp)    
+
 class Requset_bookViewsets(viewsets.ModelViewSet):
     queryset=Request_book.objects.all()
     serializer_class=Request_bookSerializer
@@ -169,7 +187,7 @@ class Book_returnViewsets(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            a,b=Book_return.objects.get_or_create(book=Issue_book.objects.get(book_id=data['book']),returned_date=data['returned_date'],fine_amount=data['fine_amount'],remarks=data['remarks'])
+            a,b=Book_return.objects.get_or_create(book=Issue_book.objects.get(id=data['issue_book']),returned_date=data['returned_date'],fine_amount=data['fine_amount'],remarks=data['remarks'])
             if not b:
                 return Response("Book returned instance already created")
             else:
@@ -180,19 +198,49 @@ class Book_returnViewsets(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'user':obj.book.user.first_name,
-                  'user_type':obj.book.user_type,
+            
+            temp={'id':obj.id,
+                 'user':obj.book.user.first_name, 
                   'returned_date':obj.returned_date,
-                  'book_no':obj.book.book.no,
+                  'book_isbn_no':obj.book.book.isbn_no,
                   'author':obj.book.book.author,
                   'title':obj.book.book.title,
                   'fine_amount':obj.fine_amount,
                   'remarks':obj.remarks 
-                }
+                }   
 
+            ss=Student.objects.get(user_id=obj.book.user.id)
+            course=ss.course.name
+            cl=SectionStudent.objects.get(student_id=ss.id).section._class.name
+            temp['class']=cl
+            temp['course']=course
             output.append(temp)
         return Response(output)
-    
+    def retrieve(self,request,pk):
+        try:
+            obj=Book_return.objects.get(id=pk)
+        except:
+            return Response({'Error!':'Book_return instance not found'},status=status.HTTP_404_NOT_FOUND)
+        temp={'user':obj.book.user.first_name+" "+obj.book.user.last_name,
+        'user_type':str(obj.book.user.type),
+        'returned_date':obj.returned_date,
+        'author':obj.book.book.author,
+        'title':obj.book.book.title,
+        'book_isbn_no':obj.book.book.isbn_no,
+        'fine_amount':obj.fine_amount,
+        'remarks':obj.remarks
+        }
+        try:
+            ss=Student.objects.get(user_id=obj.book.user.id)
+            course=ss.course.name
+            cl=SectionStudent.objects.get(student_id=ss.id).section._class.name
+            temp['class']=cl
+            temp['course']=course
+        except:
+            pass
+                
+        return Response(temp)    
+
 class SearchViewset(viewsets.ViewSet):
     queryset=Books.objects.all()
     def list(self,request):

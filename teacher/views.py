@@ -187,10 +187,12 @@ class SubjectViewSet(viewsets.ModelViewSet):
 			subject.save()
 		return Response(data,status=status.HTTP_200_OK)
 	def delete(self,request,pk):
-		subject=Subject.objects.get(id=pk)
-	
+		try:
+			subject=Subject.objects.get(id=pk)
+		except:
+			return Response({'Detail':'Subject not found!'},status=status.HTTP_404_NOT_FOUND)		
 		subject.delete()
-		return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
+		return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):

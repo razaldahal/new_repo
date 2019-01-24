@@ -1,8 +1,13 @@
 from rest_framework import serializers
+from .models import Section 
 
 class SectionSerializer(serializers.Serializer):
 	_class_id =  serializers.IntegerField()
 	name = serializers.CharField()
+
+	class Meta:
+		model= Section
+		fields=('id','_class','name')
 
 class SectionStudentSerializer(serializers.Serializer):
 	student_id = serializers.IntegerField()

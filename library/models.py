@@ -1,7 +1,7 @@
 from django.db import models
 from main.models import BaseModel,User,USER_TYPE
 # Create your models here.
-
+from main.helpers.tuple import get_choice_string
 
 class Category(BaseModel):
     name=models.CharField(max_length=30)
@@ -39,13 +39,16 @@ class Books(BaseModel):
     def __str__(self):
         return self.title+" "+self.isbn_no
 
-
+    
 class Issue_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-   # user_type=models.IntegerField(choices=USER_TYPE)
+    #user_type=models.IntegerField(choices=USER_TYPE)
     book=models.ForeignKey(Books,on_delete=models.CASCADE)
     issue_date=models.DateField()
     due_date=models.DateField() 
+
+    def get_user_type(self, obj):
+        return get_choice_string(USER_TYPE,obj.type)
 
 class Request_book(BaseModel):
     user=models.ForeignKey(User,on_delete=models.CASCADE)

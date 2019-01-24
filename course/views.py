@@ -225,7 +225,10 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
             output.append(temp)
         return Response(output)
     def update(self,request,pk):
-        a=SubjectAllocation.objects.get(id=pk)
+        try:
+            a=SubjectAllocation.objects.get(id=pk)
+        except:
+            return Response({'Detail':"Not found"},status=status.HTTP_404_NOT_FOUND)    
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
@@ -239,14 +242,18 @@ class SubjectAllocationViewset(viewsets.ModelViewSet):
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST ) 
 
     def delete(self,request,pk):
-        a=SubjectAllocation.objects.get(id=pk)
-        if a:
-            a.delete()
-            return Response('Deleted!',status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response('Not Found!',status=status.HTTP_404_NOT_FOUND)
+        try:
+            a=SubjectAllocation.objects.get(id=pk)
+        except:
+            return Response({'Detail':['Not Found!!!']},status=status.HTTP_404_NOT_FOUND)
+        
+        a.delete()
+        return Response({'Success':['Deleted!']},status=status.HTTP_204_NO_CONTENT)
     def  retrieve(self,requets,pk):
-        a=SubjectAllocation.objects.get(id=pk)
+        try:
+            a=SubjectAllocation.objects.get(id=pk)
+        except:
+            return Response({'Detail':'Not found!!'},status=status.HTTP_404_NOT_FOUND)    
         temp={'batch':a.batch.name,
         'course':a.course.name,
         'subject':a.subject.name,

@@ -34,6 +34,8 @@ GENDER =(
 class User(BaseModel, AbstractUser):
 	type = models.IntegerField(choices=USER_TYPE,null=True,blank=True)
 	gender = models.IntegerField(choices=GENDER ,null=True ,blank=True)
+
+
 	
 	
 	

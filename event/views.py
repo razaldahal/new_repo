@@ -97,7 +97,7 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             data = serializer.data
-            obj.type = EvnetType.objects.get(id=data['type'])
+            obj.type = EventType.objects.get(id=data['type'])
             obj.name = data['name']
             obj.description = data['description']
             obj.progress = data['progress']
@@ -163,28 +163,34 @@ class EventTaskViewset(viewsets.ModelViewSet):
             })
 
     def list(self, request):
-        return Response("hoejkhkds")
-        # objects=self.queryset
-        # output=[]
-        # for obj in objects:
-        #     temp={'id':obj.id,
-        #     'event':obj.event.name,
-        #     'name':obj.name,
-        #     'description':obj.description,
-        #     'status':obj.status
-        #     }
-        #     output.append(temp)
-        # return Response(output)
+        objects=self.queryset
+        output=[]
+        for obj in objects:
+            temp={'id':obj.id,
+            'event':obj.event.name,
+            'name':obj.name,
+            'description':obj.description,
+            'status':obj.status,
+            'student':obj.student.user.first_name+" "+obj.student.user.last_name,
+            'priority':obj.priority,
+            'date':obj.date
+            }
+            output.append(temp)
+        return Response(output)
 
     def retrieve(self, request, pk):
         try:
             et = EventTask.objects.get(id=pk)
         except:
             return Response({'Detail': 'EventTask not found!'}, status=status.HTTP_404_NOT_FOUND)
-        temp = {'name': et.name,
+        temp = {'id':et.id,
+            'name': et.name,
                 'event': et.event.name,
                 'description': et.description,
-                'status': et.status
+                'status': et.status,
+                'student':et.student.user.first_name+" "+et.student.user.last_name,
+                'priority':et.priority,
+                'date':et.date
                 }
         return Response(temp)
 
@@ -197,9 +203,12 @@ class EventTaskViewset(viewsets.ModelViewSet):
         if serializer.is_valid():
             data = serializer.data
             et.name = data['name']
+            et.student=Student.objects.get(id=data['student'])
             et.event = Event.objects.get(id=data['event'])
             et.description = data['description']
             et.status = data['status']
+            et.priority = data['priority']
+            et.date = data['date']
             et.save()
             return Response(data, status=status.HTTP_200_OK)
         else:
