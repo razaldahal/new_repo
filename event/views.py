@@ -163,28 +163,36 @@ class EventTaskViewset(viewsets.ModelViewSet):
             })
 
     def list(self, request):
-        return Response("hoejkhkds")
-        # objects=self.queryset
-        # output=[]
-        # for obj in objects:
-        #     temp={'id':obj.id,
-        #     'event':obj.event.name,
-        #     'name':obj.name,
-        #     'description':obj.description,
-        #     'status':obj.status
-        #     }
-        #     output.append(temp)
-        # return Response(output)
+        objects = self.queryset
+        output=[]
+        for et in objects:
+            temp = {
+                'id':et.id,
+                'name': et.name,
+                'event': et.event.name,
+                'description': et.description,
+                'status': et.status,
+                'date': et.date,
+                'user_type':et.user_type,
+                'priority':et.priority
+                }
+            output.append(temp)
+        return Response(output)
 
     def retrieve(self, request, pk):
         try:
             et = EventTask.objects.get(id=pk)
         except:
             return Response({'Detail': 'EventTask not found!'}, status=status.HTTP_404_NOT_FOUND)
-        temp = {'name': et.name,
+        temp = {
+            'id':et.id,
+            'name': et.name,
                 'event': et.event.name,
                 'description': et.description,
-                'status': et.status
+                'status': et.status,
+                'date': et.date,
+                'user_type':et.user_type,
+                'priority':et.priority
                 }
         return Response(temp)
 
