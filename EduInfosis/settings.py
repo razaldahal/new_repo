@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'transport',
     'dashboard',
     'event',
-    'exam'
+    'exam',
+    'report'
 ]
 
 MIDDLEWARE = [

@@ -208,12 +208,16 @@ class Book_returnViewsets(viewsets.ModelViewSet):
                   'fine_amount':obj.fine_amount,
                   'remarks':obj.remarks 
                 }   
+            try:
 
-            ss=Student.objects.get(user_id=obj.book.user.id)
-            course=ss.course.name
-            cl=SectionStudent.objects.get(student_id=ss.id).section._class.name
-            temp['class']=cl
-            temp['course']=course
+                ss=Student.objects.get(user_id=obj.book.user.id)
+                course=ss.course.name
+                cl=SectionStudent.objects.get(student_id=ss.id).section._class.name
+                temp['class']=cl
+                temp['course']=course
+            except:
+                pass
+
             output.append(temp)
         return Response(output)
     def retrieve(self,request,pk):
@@ -228,8 +232,7 @@ class Book_returnViewsets(viewsets.ModelViewSet):
         'title':obj.book.book.title,
         'book_isbn_no':obj.book.book.isbn_no,
         'fine_amount':obj.fine_amount,
-        'remarks':obj.remarks
-        }
+        'remarks':obj.remarks}
         try:
             ss=Student.objects.get(user_id=obj.book.user.id)
             course=ss.course.name

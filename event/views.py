@@ -189,6 +189,7 @@ class EventTaskViewset(viewsets.ModelViewSet):
                 'description': et.description,
                 'status': et.status,
                 'student':et.student.user.first_name+" "+et.student.user.last_name,
+                'user_type':et.student.user.type,
                 'priority':et.priority,
                 'date':et.date
                 }
