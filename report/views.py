@@ -37,7 +37,7 @@ class ReportViewset(viewsets.ViewSet):
                         stdt=Student.objects.get(user=usr)
                         print(stdt.id)
                         try:
-                            stdtadm=StudentAdmission.objects.get(student_id=stdt.id)
+                            stdtadm=StudentAdmission.objects.get(student_id=4)
                         except:
                             return Response('student exists but it is not admitted')    
                         bat=stdtadm.batch
@@ -65,7 +65,7 @@ class ReportViewset(viewsets.ViewSet):
                             stdtadm=stdtadm
                             tmp['admission_date'] = stdtadm.admission_date
                             try:
-                                gstd=GuardianStudent.objects.get(student_id=std.id)
+                                gstd=GuardianStudent.objects.get(student_id=3)
                             except:
                                 return Response('Guardian student object for the student does not exist')    
 
@@ -75,7 +75,7 @@ class ReportViewset(viewsets.ViewSet):
                             gphone=Phone.objects.get(content_type=gc,object_id=grd.id,type=1)
                             tmp['guardian_details'] = {'contact':PhoneSerializer(gphone).data,
                                                 'address':AddressSerializer(gaddress).data,
-                                                'name':grd.user.first_name+" "+grd.user.last_name}
+                                                'name':grd.first_name+" "+grd.last_name}
                             lst.append(tmp)
                         else:
                             return Response('no matching result found!')
@@ -137,7 +137,7 @@ class ReportViewset(viewsets.ViewSet):
                             gphone=Phone.objects.get(content_type=gc,object_id=grd.id,type=1)
                             tmp['guardian_details'] = {'contact':PhoneSerializer(gphone).data,
                                                     'address':AddressSerializer(gaddress).data,
-                                                    'name':grd.user.first_name+" "+grd.user.last_name}
+                                                    'name':grd.first_name+" "+grd.last_name}
 
                             lst.append(tmp)
 
@@ -146,7 +146,7 @@ class ReportViewset(viewsets.ViewSet):
                             return Response('No matching result!')
                 else:
                     return Response('no matching students or users for given query parameters')      
-                res=lst   
+            res=lst   
         return Response(res)
 
                 
