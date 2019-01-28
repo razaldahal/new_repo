@@ -17,7 +17,8 @@ class ReportViewset(viewsets.ViewSet):
         
         userdql=['blood_group','gender','religion','route']
         r=request.GET
-        res=[]
+        res=[] 
+        lst=[]
         for k in userdql:
             print(k)
             if k in r and k != 'route':
