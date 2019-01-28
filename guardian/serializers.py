@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from admission.serializers import *
 from student.models import Student
-
+from .models import GUARDIAN_TYPE
 
 class GuardianSerializer(serializers.Serializer):
 	user = UserSerializer()
-	guardian_type = serializers.IntegerField()
+	guardian_type = serializers.ChoiceField(choices=GUARDIAN_TYPE)
 	phone_detail=PhoneSerializer()
 	address_deatail=AddressSerializer()
 	

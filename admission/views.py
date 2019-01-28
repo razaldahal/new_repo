@@ -17,18 +17,16 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 	queryset = StudentAdmission.objects.all()
 	serializer_class = StudentAdmissionSerializer
 	#parser_classes = (NestedMultipartParser,)
+	def list(self,request):
+		output=[]
+		for obj in self.queryset:
+			temp={'id':obj.id}
+			output.append(temp)
+		return Response(output)	
 
-
-
-	def get(self, request):
-		return Response([])
-	def list(self, request):
-		return Response([])
 	def create(self,request):
 		print(request.data)
 		serializer = self.get_serializer(data={**request.data,**request.FILES})
-
-
 		if serializer.is_valid():
 			data = serializer.data
 			ud = data['user']

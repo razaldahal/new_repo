@@ -15,57 +15,138 @@ class ReportViewset(viewsets.ViewSet):
 
     def list(self,request):
         
-        userdql=['blood_group','gender','religion']
+        userdql=['blood_group','gender','religion','route']
+        r=request.GET
         res=[]
         for k in userdql:
-            if k in request.GET:
+            print(k)
+            if k in r and k != 'route':
                 
-                v=request.GET.get(k)
+                v=r.get(k)
                 qr={"{}".format(k):"{}".format(v)}
                 userd=UserDetail.objects.filter(**qr)
-                userval=userd.values('user')
-                
-                for user in userval:
-                    usr=User.objects.get(**user)
-                    stdt=Student.objects.get(user_id=usr.id)
-                    stdtadm=StudentAdmission.objects.get(student_id=stdt.id)
-                    bat=stdtadm.batch
-                    
-                    if bat == request.GET.get('batch'):
-                        lst=[]
-                        c=ContentType.objects.get_for_model(usr)
-                        address = Address.objects.get(content_type=c,object_id=usr.id)
-                        phone = Phone.objects.get(content_type=c,object_id=usr.id,type=1)
-                        father = Parent.objects.get(content_type=c,object_id=usr.id,type='Father' )
-                        mother = Parent.objects.get(content_type=c,object_id=usr.id,type='Mother')
-                        tmp={}
-                        tmp['user']  = usr.first_name+" "+usr.last_name
-                        tmp['email'] = usr.email
-                        tmp['address_detail'] = AddressSerializer(address).data
-                        phone_data = PhoneSerializer(phone).data
-                        tmp['phone'] = phone_data
-                        tmp['parent_details']={
-			                'father':FatherSerializer(father).data,
-			                'mother':MotherSerializer(mother).data
-			                }
-                        std=Student.objects.get(user_id=usr.id)
-                        stdadm=StudentAdmission.objects.get(student_id=std.id)
-                        tmp['admission_date'] = stdadm.admission_date
-                        gstd=GuardianStudent.objects.get(student_id=std.id)
-                        grd=gstd.guardian.user
-                        gc=ContentType.objects.get_for_model(grd)
-                        gaddress=Address.objects.get(content_type=gc,object_id=grd.id)
-                        gphone=Phone.objects.get(content_type=gc,object_id=grd.id,type=1)
-                        tmp['guardian_details'] = {'contact':PhoneSerializer(gphone).data,
+                userv=userd.values('user')
+                userval=[users for users in userv]
+                if userval != []:
+                    print(userval)
+                    for user in userval:
+                        print(user)
+                        vls=list(user.values())
+                        usr=User.objects.get(id=vls[0])
+                        print(usr)
+                        stdt=Student.objects.get(user=usr)
+                        print(stdt.id)
+                        try:
+                            stdtadm=StudentAdmission.objects.get(student_id=stdt.id)
+                        except:
+                            return Response('student exists but it is not admitted')    
+                        bat=stdtadm.batch
+                        print(bat)
+                        print(r.get('batch'))
+                        if bat == int(r.get('batch')):
+                            print('True')
+                            lst=[]
+                            c=ContentType.objects.get_for_model(usr)
+                            address = Address.objects.get(content_type=c,object_id=usr.id)
+                            phone = Phone.objects.get(content_type=c,object_id=usr.id,type=1)
+                            father = Parent.objects.get(content_type=c,object_id=usr.id,type='Father' )
+                            mother = Parent.objects.get(content_type=c,object_id=usr.id,type='Mother')
+                            tmp={}
+                            tmp['user']  = usr.first_name+" "+usr.last_name
+                            tmp['email'] = usr.email
+                            tmp['address_detail'] = AddressSerializer(address).data
+                            phone_data = PhoneSerializer(phone).data
+                            tmp['phone'] = phone_data
+                            tmp['parent_details']={
+			                    'father':FatherSerializer(father).data,
+			                    'mother':MotherSerializer(mother).data
+			                    }
+                            std=stdt
+                            stdtadm=stdtadm
+                            tmp['admission_date'] = stdtadm.admission_date
+                            try:
+                                gstd=GuardianStudent.objects.get(student_id=std.id)
+                            except:
+                                return Response('Guardian student object for the student does not exist')    
+
+                            grd=gstd.guardian.user
+                            gc=ContentType.objects.get_for_model(grd)
+                            gaddress=Address.objects.get(content_type=gc,object_id=grd.id)
+                            gphone=Phone.objects.get(content_type=gc,object_id=grd.id,type=1)
+                            tmp['guardian_details'] = {'contact':PhoneSerializer(gphone).data,
                                                 'address':AddressSerializer(gaddress).data,
                                                 'name':grd.user.first_name+" "+grd.user.last_name}
+                            lst.append(tmp)
+                        else:
+                            return Response('no matching result found!')
+                else:
+                    return Response('no matching users for given query parameters')        
+            elif k in r and k == 'route':
 
-                        lst.append(tmp)
-                        
-                    
-                    else:
-                        return Response('No matching result!')  
-                    res=lst   
+                v=r.get(k)
+                qr={"{}".format(k):"{}".format(v)}
+                print(qr)
+                tstd=TransportAllocation.objects.filter(**qr)
+                
+
+                tstdv=tstd.values('student')
+            
+                print(tstdv)
+                stdval=[std for std in tstdv]
+                if stdval != []:
+                    print(stdval)
+                    for stds in stdval:
+                        print(stds)
+                        stdvals=list(stds.values())
+                        stdnt=Student.objects.get(id=stdvals[0])
+                        try:
+                            stdntadm=StudentAdmission.objects.get(student_id=stdnt.id)
+                        except:
+                            return Response('Student exists but it is not admitted')    
+                        bat=stdntadm.batch
+                        usr=stdnt.user
+
+                        if bat == int(r.get('batch')):
+                            print('True')
+                            lst=[]
+                            c=ContentType.objects.get_for_model(usr)
+                            address = Address.objects.get(content_type=c,object_id=usr.id)
+                            phone = Phone.objects.get(content_type=c,object_id=usr.id,type=1)
+                            father = Parent.objects.get(content_type=c,object_id=usr.id,type='Father' )
+                            mother = Parent.objects.get(content_type=c,object_id=usr.id,type='Mother')
+                            tmp={}
+                            tmp['user']  = usr.first_name+" "+usr.last_name
+                            tmp['email'] = usr.email
+                            tmp['address_detail'] = AddressSerializer(address).data
+                            phone_data = PhoneSerializer(phone).data
+                            tmp['phone'] = phone_data
+                            tmp['parent_details']={
+			                    'father':FatherSerializer(father).data,
+			                    'mother':MotherSerializer(mother).data
+			                    }
+                            std=stdnt
+                            stdadm=stdntadm
+                            tmp['admission_date'] = stdadm.admission_date
+                            try:
+                                gstd=GuardianStudent.objects.get(student_id=std.id)
+                            except:
+                                return Response('Guardian student object for this student does not exist')    
+                            grd=gstd.guardian.user
+                            gc=ContentType.objects.get_for_model(grd)
+                            gaddress=Address.objects.get(content_type=gc,object_id=grd.id)
+                            gphone=Phone.objects.get(content_type=gc,object_id=grd.id,type=1)
+                            tmp['guardian_details'] = {'contact':PhoneSerializer(gphone).data,
+                                                    'address':AddressSerializer(gaddress).data,
+                                                    'name':grd.user.first_name+" "+grd.user.last_name}
+
+                            lst.append(tmp)
+
+
+                        else:
+                            return Response('No matching result!')
+                else:
+                    return Response('no matching students or users for given query parameters')      
+                res=lst   
         return Response(res)
 
                 

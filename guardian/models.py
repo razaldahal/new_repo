@@ -11,7 +11,7 @@ GUARDIAN_TYPE =(
 
 class Guardian(BaseModel):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
-	type = models.IntegerField(choices=GUARDIAN_TYPE)
+	type = models.CharField(choices=GUARDIAN_TYPE,max_length=7)
 
 class GuardianStudent(BaseModel):
 	guardian = models.ForeignKey(Guardian,on_delete=models.CASCADE)
