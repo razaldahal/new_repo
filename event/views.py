@@ -137,9 +137,9 @@ class EventTaskViewset(viewsets.ModelViewSet):
                 except:
                     return Response({"Detail": ["Your Event With This Id not exist"]})
                 if _event_id:
-                    _task, c = EventTask.objects.get_or_create(student_id=data['student'],
+                    _task, c = EventTask.objects.get_or_create(student=Student.objects.get(id=data['student']),
                                                                name=data['name'], user_type=3,
-                                                               event_id=data['event'],
+                                                               event=Event.objects.get(id=data['event']),
                                                                defaults={
                                                                     'description': data['description'],
                                                                     'status': data['status'],
@@ -194,10 +194,9 @@ class EventTaskViewset(viewsets.ModelViewSet):
                 'date':et.date
                 }
         return Response(temp)
-
     def update(self, request, pk):
         try:
-            et = EevntTask.objects.get(id=pk)
+            et = EventTask.objects.get(id=pk)
         except:
             return Response({'Detail': 'EventTask not found!'}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(data=request.data)
@@ -210,6 +209,7 @@ class EventTaskViewset(viewsets.ModelViewSet):
             et.status = data['status']
             et.priority = data['priority']
             et.date = data['date']
+            et.user_type=data['user_type']
             et.save()
             return Response(data, status=status.HTTP_200_OK)
         else:

@@ -81,6 +81,32 @@ class BooksViewset(viewsets.ModelViewSet):
                   }
             output.append(temp)
         return Response(output)
+    def update(self,request,pk):
+        try:
+            obj=Books.objects.get(id=pk)
+        except:
+            return Response('Book does not exist',status=status.HTTP_404_NOT_FOUND)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            obj.purchase_date=data['purchase_date']
+            obj.bill_no=data['bill_no']
+            obj.isbn_no=data['isbn_no']
+            obj.no=data['no']
+            obj.title=data['title']
+            obj.author=data['author']
+            obj.edition=data['edition']
+            obj.category=Category.objects.get(id=data['category'])
+            obj.publisher=data['publisher']
+            obj.no_of_copies=data['no_of_copies']
+            obj.shelf_no=data['shelf_no']
+            obj.position=data['position']
+            obj.book_cost=data['position']
+            obj.book_condition=data['book_condition']
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+
 
 class Issue_bookViewset(viewsets.ModelViewSet):
     queryset=Issue_book.objects.all()

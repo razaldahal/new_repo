@@ -192,7 +192,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 		except:
 			return Response({'Detail':'Subject not found!'},status=status.HTTP_404_NOT_FOUND)		
 		subject.delete()
-		return Response(status=status.HTTP_204_NO_CONTENT)
+		return Response('Deleted!',status=status.HTTP_204_NO_CONTENT)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):

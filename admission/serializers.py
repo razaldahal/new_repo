@@ -33,7 +33,7 @@ class UserDetailSerializer(serializers.Serializer):
 	blood_group = serializers.CharField(max_length=120,required=True)
 	nationality = serializers.CharField(max_length=120)
 	mother_tongue = serializers.CharField(max_length=120)
-	religion = serializers.IntegerField()
+	religion = serializers.ChoiceField(choices=RELIGION)
 	citizenship_no = serializers.CharField()
 
 

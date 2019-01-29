@@ -1,5 +1,6 @@
 from .models import *
 from rest_framework import serializers
+from main.models import USER_TYPE
 
 class EventTypeserializer(serializers.Serializer):
     name=serializers.CharField()
@@ -14,14 +15,14 @@ class EventSerializer(serializers.Serializer):
     status=serializers.CharField()
 
 class EventTaskSerializer(serializers.Serializer):
-    event = serializers.IntegerField()
+    event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
     name=serializers.CharField()
     description=serializers.CharField()
     status=serializers.CharField()
     priority = serializers.IntegerField()
     date = serializers.DateField()
-    user = serializers.IntegerField()
-    student = serializers.IntegerField()
+    user_type = serializers.ChoiceField(choices=USER_TYPE)
+    student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
 
 
 

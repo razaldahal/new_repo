@@ -69,6 +69,8 @@ class Address(BaseModel):
 	object_id = models.PositiveIntegerField(null=True)
 	content_object = fields.GenericForeignKey('content_type', 'object_id')
 
+
+	
 	province = models.CharField(max_length=120)
 	district = models.CharField(max_length=120)
 	city = models.CharField(max_length=120)
@@ -84,7 +86,7 @@ class UserDetail(BaseModel):
 	blood_group = models.CharField(max_length=5)
 	nationality = models.CharField(max_length=120)
 	mother_tongue = models.CharField(max_length=120)
-	religion = models.IntegerField(choices=RELIGION)
+	religion = models.CharField(choices=RELIGION,max_length=7)
 	citizenship_no = models.CharField(max_length=10)
 
 
