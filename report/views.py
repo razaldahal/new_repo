@@ -86,9 +86,9 @@ class ReportViewset(viewsets.ViewSet):
 
                             lst.append(tmp)
                         else:
-                            return Response('no matching result found!')
+                            return Response ([])
                 else:
-                    return Response('no matching users for given query parameters')        
+                    return Response([])        
             elif k in r and k == 'route':
 
                 v=r.get(k)
@@ -151,12 +151,12 @@ class ReportViewset(viewsets.ViewSet):
 
 
                         else:
-                            return Response('No matching result found!')
+                            return Response ([])
             
 
                                 
                 else:
-                    return Response('no matching students or users for given query parameters')
+                    return Response([])
             elif k not in r and k=='gender':
                 v=r.get(k)
                 qr={"{}".format(k):"{}".format(v)}
@@ -220,9 +220,9 @@ class ReportViewset(viewsets.ViewSet):
 
                             lst.append(tmp)
                         else:
-                            return Response('no matching result found!')         
+                            return Response ([])        
                 else:
-                    return Response('no matching students or users for given query parameters')            
+                    return Response ([])          
             
             res=lst   
         return Response(res)

@@ -22,7 +22,8 @@ USER_TYPE=(
 	(4,'GUEST'),
 	(5,'ACCOUNTANT'),
 	(6,'LIBRARIAN'),
-	(7,'BUSSTAFF')
+	(7,'BUSSTAFF'),
+	(8,'GUARDIAN'),
 	)
 
 GENDER =(
@@ -77,8 +78,8 @@ class Address(BaseModel):
 	address = models.CharField(max_length=120) ## eg. ramjanaki tole, bharatpur
 
 RELIGION=(
-	('HINDU',1),
-	('MUSLIM',2),
+	(1,'HINDU'),
+	(2,'MUSLIM'),
 	)
 
 class UserDetail(BaseModel):

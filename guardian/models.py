@@ -4,9 +4,9 @@ from student.models import Student
 
 
 GUARDIAN_TYPE =(
-	('FATHER',1),
-	('MOTHER',2),
-	('LOCAL',3)
+	(1,'FATHER'),
+	(2,'MOTHER'),
+	(3,'LOCAL')
 	)
 
 class Guardian(BaseModel):

@@ -4,15 +4,16 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import serializers
-
+from course.models import Batch,Course
 from main.models import User,Address,Phone,UserDetail,Parent,GENDER
 from student.models import Student
 from .models import StudentAdmission
-from .serializers import StudentAdmissionSerializer
+from .serializers import StudentAdmissionSerializer,UserSerializer,AddressSerializer,PhoneSerializer,UserDetailSerializer
 from main.helpers.parser import NestedMultipartParser
 from main.helpers.tuple import get_choice_string
-
-
+from Section.models import Section,SectionStudent
+from guardian.models import Guardian,GuardianStudent
+from transport.models import TransportAllocation,Route
 class StudentAdmissionViewSet(viewsets.ModelViewSet):
 	queryset = StudentAdmission.objects.all()
 	serializer_class = StudentAdmissionSerializer
@@ -103,11 +104,20 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 			# 	Father.objects.get_or_create(defaults={'name':Parent.name,'mobile':Parent.mobile,'job':Parent.job,'citizenship':Parent.citizenship})
 			# if data['parent_detail']['type']=='Mother':
 			# 	Mother.objects.get_or_create(defaults={'name':Parent.name,'mobile':Parent.mobile,'job':Parent.job,'citizenship':Parent.citizenship})
-
+			guser=User.objects.get_or_create(first_name=data['guardian']['guser']['first_name'],last_name=data['guardian']['guser']['last_name'],email=data['guardian']['guser']['email'],gender=data['guardian']['guser']['gender'],type=data['guardian']['guser']['type'])[0]
+			guardian,b=Guardian.objects.get_or_create(user=guser,type=data['guardian']['guardian_type'])
+			gaddress=Address.objects.get_or_create(content_type=ContentType.objects.get_for_model(guser),object_id=guser.id,defaults=AddressSerializer(data['guardian']['address_detail']).data)[0]
+			gphone=Phone.objects.get_or_create(content_type=ContentType.objects.get_for_model(guser),object_id=guser.id,defaults=PhoneSerializer(data['guardian']['phone_detail']).data)[0]
+			
+			section,val=Section.objects.get_or_create(_class_id=data['section']['_class_id'],name=data['section']['name'])
 
 			student,bval = Student.objects.get_or_create(user_id=user.id,registration_no=data['registration_no'])
 
-			StudentAdmission.objects.get_or_create(student_id=student.id,
+			if guardian:
+				GuardianStudent.objects.get_or_create(student_id=student.id,guardian_id=guardian.id)
+			if section:
+				SectionStudent.objects.get_or_create(section_id=section.id,student_id=student.id,roll_no=student.registration_no)	
+			stdadm,vals=StudentAdmission.objects.get_or_create(student_id=student.id,
 												   defaults={   
 												   'batch':data['batch'],
 												   'course_id':data['course'],
@@ -116,7 +126,8 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 												   }
 												   )
 												   
-
+			if stdadm:
+				TransportAllocation.objects.get_or_create(route=Route.objects.get(id=data['transport']['route']),batch=Batch.objects.get(id=stdadm.batch),course=stdadm.course,student=student,_class=section._class,section=section)
 
 
 

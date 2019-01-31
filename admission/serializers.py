@@ -2,6 +2,10 @@ from rest_framework import serializers
 from main.models import RELIGION,TYPE,GENDER,USER_TYPE,User
 from main.helpers.tuple import get_choice_string
 from student.models import Student
+from guardian.models import GUARDIAN_TYPE
+from Section.serializers import SectionSerializer
+from transport.models import Route
+from course.models import Batch,Course
 choices=(
 		('Father','FATHER'),
 		('Mother','MOTHER'),
@@ -65,8 +69,13 @@ class MotherSerializer(serializers.Serializer):
 	mobile=serializers.CharField(max_length=20)
 	job=serializers.CharField(max_length=30)
 	citizenship_no=serializers.CharField(max_length=10)
-
-
+class GuardianSerializer(serializers.Serializer):
+	guser = UserSerializer()
+	guardian_type = serializers.ChoiceField(choices=GUARDIAN_TYPE)
+	phone_detail=PhoneSerializer()
+	address_detail=AddressSerializer()
+class TransportAllocationSerializer(serializers.Serializer):
+    route=serializers.PrimaryKeyRelatedField(queryset=Route.objects.all())	
 class StudentAdmissionBaseSerializer(serializers.Serializer):
 	user = UserSerializer()
 	user_detail = UserDetailSerializer()
@@ -75,8 +84,10 @@ class StudentAdmissionBaseSerializer(serializers.Serializer):
 	registration_no = serializers.IntegerField()
 	batch = serializers.IntegerField()
 	description = serializers.CharField(default='')
-	
+	section=SectionSerializer()
+	guardian=GuardianSerializer()
 	#image = serializers.ImageField()
+	transport = TransportAllocationSerializer()
 	father=FatherSerializer()
 	mother=MotherSerializer()
 
@@ -98,7 +109,7 @@ class StudentUpdateSerializer(serializers.Serializer):
 	phone_detail = PhoneSerializer()
 	address_detail = AddressSerializer()
 	registration_no = serializers.IntegerField()
-	batch = serializers.IntegerField()
+	batch = serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
 	description = serializers.CharField(default='')
 	
 	#image = serializers.ImageField()

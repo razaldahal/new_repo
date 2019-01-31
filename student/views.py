@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import fields
 from rest_framework import serializers
-
+from rest_framework import status
 from admission.models import StudentAdmission
-from admission.serializers import *
+from admission.serializers import StudentUpdateSerializer,UserGetSerializer,UserDetailSerializer,PhoneSerializer,AddressSerializer,FatherSerializer,MotherSerializer,GuardianSerializer,SectionSerializer,TransportAllocationSerializer
 from main.models import UserDetail
 from .models import Student,TestStudent
 from main.models import Address,Phone,Parent
@@ -21,7 +21,7 @@ from .serializers import StudentAssignmentSerializer,StudentAssignmentDetail,Ass
 class StudentGetViewSet(viewsets.ModelViewSet):
 
 	queryset = Student.objects.all()
-	serializer_class = UserGetSerializer
+	serializer_class = StudentUpdateSerializer
 	http_method = ['get', 'put']
 
 	def list(self,request):
@@ -73,7 +73,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 
 	def retrieve(self,request,pk):
 		try:
-			user_obj = StudentAdmission.objects.get(id=pk)
+			user_obj = StudentAdmission.objects.get(student_id=pk)
 		except:
 			raise serializers.ValidationError({
 				'Detail':['This Id Doesnot Exist']
@@ -191,7 +191,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 			student.save()
 			user_obj.save()
 
-			return Response(serializer.data,status=status.HTTP_)
+			return Response(serializer.data,status=status.HTTP_200_OK)
 		else:
 			return Response(serializer.errors)
 
