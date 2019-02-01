@@ -1,6 +1,7 @@
 from django.db import models
 from main.models import BaseModel,User,Phone,Address
 from student.models import Student
+from teacher.models import Teacher
 payment_type_c=(
               (0,'MONTHLY'),
               (1,'TERMINAL'),
@@ -42,3 +43,10 @@ class Fees_due(BaseModel):
     ac_start_date=models.DateField()
     rate=models.IntegerField()
     date=models.DateField()
+
+class TeacherSalary(BaseModel):
+    teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE)
+    year=models.IntegerField()
+    month=models.IntegerField()
+    salary=models.IntegerField()
+    deduction=models.IntegerField()

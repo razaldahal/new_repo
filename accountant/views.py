@@ -4,9 +4,9 @@ from .serializers import *
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 # Create your views here.
-from datetime import datetime
-
-
+from datetime import datetime,date
+import calendar
+from teacher.models import Teacher
 class AccountantViewset(viewsets.ModelViewSet):
     queryset=Accountant.objects.all()
     serializer_class=AccountantSerializer
@@ -124,3 +124,79 @@ class FeesdueViewSets(viewsets.ModelViewSet):
 
         else:
             raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+
+class TeacherSalaryViewset(viewsets.ModelViewSet):
+    queryset=TeacherSalary.objects.all()
+    serializer_class=TeacherSalarySerializer
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        try:
+            request.data['year']<=(date.today()).year
+        except:
+            return Response({'error':['the year value is invalid']} )
+        try:
+            request.data['month'] in range (1,13)
+        except:
+            return Response({'error':['month value is not valid']})    
+
+        try:
+            t=Teacher.objects.get(id=request.data['teacher'])
+        except:
+            return Response({'sorry':'Teacher does not exist,please create the related teacher object first'},status=status.HTTP_404_NOT_FOUND)
+        if serializer.is_valid():
+            data=serializer.data
+
+            
+            
+            ts,b=Teacher.objects.get_or_create(teacher=t,defaults={'year':data['year'],'month':data['month']},salary=data['salary'],deduction=data['deduction'])
+            if not b:
+                return Response({'Error':['The teacher salary object already exists']},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)        
+
+    def list(self,request):
+        objects=self.queryset
+        output=[]
+        
+        for obj in objects:
+
+            temp={'id':obj.id,
+            'teacher':obj.teacher.user.first_name+" "+obj.teacher.user.last_name,
+            'year':str(obj.year)+" "+"A.D.",
+            'month':calendar.month_name[obj.month],
+            'deduction':obj.deduction
+            }
+            output.append(temp)
+        return Response(output)
+    def retrieve(self,request,pk):
+        try:
+            obj=TeacherSalary.objects.get(id=pk)
+        except:
+            return Response({'error':['teacher salary not found']},status=status.HTTP_404_NOT_FOUND)
+        temp={'id':obj.id,
+        'teacher':obj.teacher.user.first_name+" "+obj.teacher.user.last_name,
+        'year':str(obj.year)+" "+"A.D.",
+        'month':calendar.month_name[obj.month],
+        'deduction':obj.deduction
+        }
+
+        return Response(temp)
+    def update(self,request,pk):
+        try:
+            ts=TeacherSalary.objects.get(id=pk)
+        except:
+            return Response({'error':['Teacher Salary object not found']},status=status.HTTP_404_NOT_FOUND)
+        serializer=TeacherSalaryUpdateSerializer()
+        if serializer.is_valid():
+            data=serializer.data
+            ts.teacher=Teacher.objects.get(id=data['teacher'])
+            ts.salary=data['salary']
+            ts.deduction=data['deduction']
+            ts.save()
+        return Response(data,status=status.HTTP_200_OK)    
+
+

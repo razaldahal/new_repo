@@ -2,6 +2,7 @@ from rest_framework import serializers
 from admission.serializers import UserSerializer
 from .models import Payments,Studentpayments,Accountant
 from student.models import Student
+from teacher.models import Teacher
 class AccountantSerializer(serializers.Serializer):
     user= UserSerializer()
     esp_id= serializers.SlugField()
@@ -26,3 +27,17 @@ class FeesDueSerializer(serializers.Serializer):
     ac_start_date=serializers.DateField()
     rate=serializers.IntegerField() 
     date=serializers.DateField()
+
+class TeacherSalarySerializer(serializers.Serializer):
+    teacher=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
+    year=serializers.IntegerField()
+    month=serializers.IntegerField()
+    salary=serializers.IntegerField()
+    deduction=serializers.IntegerField()    
+
+
+class TeacherSalaryUpdateSerializer(serializers.Serializer):
+    salary=serializers.IntegerField()
+    deduction=serializers.IntegerField()
+    teacher=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())    
+    

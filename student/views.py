@@ -180,7 +180,7 @@ class StudentGetViewSet(viewsets.ModelViewSet):
 
 			
 
-
+			
 
 
 			address.save()

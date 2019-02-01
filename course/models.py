@@ -27,8 +27,6 @@ class Course(BaseModel):
 	syllabus_name=models.CharField(max_length=100)
 
 
-	class Meta:
-		db_table='course_course__old'
 
 
 	def __str__(self):
@@ -40,10 +38,6 @@ class Batch(BaseModel):
 	start_date=models.DateField()
 	end_date=models.DateField()
 	max_no_of_students=models.IntegerField()
-
-	class Meta:
-		db_table='course_batch__old'
-
 
 	def __str__(self):
 		return self.name
