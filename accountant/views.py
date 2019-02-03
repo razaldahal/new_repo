@@ -61,9 +61,9 @@ class PaymentsViewSet(viewsets.ModelViewSet):
             x=Student.objects.get(id=pf)
             a,b = User.objects.get_or_create(email=pb['email'],defaults={'username':pb['email'],'first_name':pb['first_name'],'last_name':pb['last_name'],'gender':pb['gender'],'type':pb['type']})
             k=User.objects.get(id=a.id)    
-            c,d = Payments.objects.get_or_create(payment_type=data['payment_type'],paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=data['date_of_transaction'],short_description=data['short_description'],cheque_no=data['cheque_no'])
-            i,j = Studentpayments.objects.get_or_create(student=c.paid_for,payments=c)
-            if not j:
+            c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_typr'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'])
+            
+            if not d:
                 return Response('some error')
             else:
                 return Response(data,status=status.HTTP_201_CREATED)
@@ -84,46 +84,84 @@ class PaymentsViewSet(viewsets.ModelViewSet):
              }
             output.append(temp)
         return Response(output)    
- 
-class FeesdueViewSets(viewsets.ModelViewSet):
-    queryset=Fees_due.objects.all()
-    serializer_class=FeesDueSerializer
+class StudentAcViewSet(viewsets.ViewSet):
+    queryset=StudentAc.objects.all()
+    serializer_class=StudentAcSerializer
 
     def create(self,request):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
-            data=serializer.data
-            a = Student.objects.get(id=data['student'])
-            Fees_due.objects.get_or_create(date=data['date'],student_id=a.id,fee_type=data['fee_type'],ac_start_date=data['ac_start_date'],rate=data['rate'])
+            data=request.data
+            p=Payments.objects.filter(paid_for=Student.objects.get(id=data['student']))
+            if p==None:    
+                return Response('No payments instance for this student found')
+            else:
+                pv=p.values()
+                pl=[pay for pay in pv]
+                num=pl.count
+                for i in range(num):
+                    if i==0:
+                        payment=pl[i]
+                        rate=payment.payment_type.rate
+                        paid_date=payment.date_of_transaction
+                        paid_amount=payment.paid_amount
+                        discount_type=payment.discount_type
+                        discount_amount=payment.total_discount_amount
+                        fine_amount=payment.fine_amount
+                        total_due=rate-discount_amount+fine_amount-paid_amount
+                        if total_due>0:
+                            due_amount=total_due
+                            credit_amount=0
+                            balance=0+due_amount
+                        elif total_due<0:
+                            due_amount=0
+                            credit_amount=0-total_due
+                            balance=0+due_amount
+                        elif total_due==0:
+                            due_amount=0
+                            credit_amount=0
+                            balance=0
 
-            b=Payments.objects.filter(paid_for=a).order_by('-date_of_transaction')
-            payment=0
-            if data['fee_type']==0:
-                total=data['rate']*(data['date'].month-data['ac_start_date'].month)
-                for payments in b:
-                    payment+=payments.paid_amount
-                total_payments=payment
-                balance=total-total_payments
-            if data['fee_type']==1:
-                total=(data['rate']*(data['date'].month-data['ac_start_date'].month))/4
-                for payments in b:
-                    payment+=payments.paid_amount
-                total_payments=payment
-                balance=total-total_payments
-            if data['fee_type']==2:
-                total=(data['rate']*(data['date'].month-data['ac_start_date'].month))/12
-                for payments in b:
-                    payment+=payments.paid_amount
-                total_payments=payment
-                balance=total-total_payments
+                        stac,c=StudentAc.objects.get_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
 
-            return Response({'balance':balance})
+                    elif i>0:
+                        payment=pl[i]
+                        stacc=StudentAc.objects.get(payments=pl[i-1])
+                        rate=payment.rate
+                        paid_date=payment.paid_date
+                        paid_amount=payment.paid_amount
+                        discount_type=payment.discount_type
+                        discount_amount=payment.discount_amount
+                        fine_amount=payment.fine_amount
+                        if payment.payment_type.name==0:
+                            no_of_months=(paid_date-pl[i-1].paid_date).month
+                            payable_fee=rate*no_of_months
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
+                            
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0+due_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0
+
+                            stac,c=StudentAc.objects.get_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+
+                        elif payment.payment_type.name==1:
+
+                            no_of_quarters=((paid_date-pl[i-1].paid_date).month)/4
+                            payable_fee=rate*no_of_months
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
 
 
 
-
-        else:
-            raise serializers.ValidationError({'Detail':[serializer.errors]})
+    
 
 
 class TeacherSalaryViewset(viewsets.ModelViewSet):

@@ -214,9 +214,11 @@ class Book_returnViewsets(viewsets.ModelViewSet):
         if serializer.is_valid():
             data=serializer.data
             a,b=Book_return.objects.get_or_create(book=Issue_book.objects.get(id=data['issue_book']),returned_date=data['returned_date'],fine_amount=data['fine_amount'],remarks=data['remarks'])
+            
             if not b:
                 return Response("Book returned instance already created")
             else:
+                
                 return Response('Book return successful')
         else:
             return Response(serializer.errors)

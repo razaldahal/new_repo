@@ -1,32 +1,38 @@
 from rest_framework import serializers
 from admission.serializers import UserSerializer
-from .models import Payments,Studentpayments,Accountant
+from .models import Payments,Accountant,payment_type_c,PaymentType,get_choice_string,Class,discount_type_c
 from student.models import Student
 from teacher.models import Teacher
 class AccountantSerializer(serializers.Serializer):
     user= UserSerializer()
     esp_id= serializers.SlugField()
 
+class PaymentTypeSerializer(serializers.Serializer):
+    _class=serializers.PrimaryKeyRelatedField(queryset=Class.objects.all())
+    name=serializers.ChoiceField(choices=payment_type_c)
+    rate=serializers.IntegerField()
+    def get_name(self,obj):
+        return get_choice_string(payment_type_c,obj.name)
 class PaymentsSerializer(serializers.Serializer):
-    payment_type=serializers.IntegerField()
+    payment_type=serializers.PrimaryKeyRelatedField(queryset=PaymentType.objects.all())
     paid_method=serializers.IntegerField()
     paid_by=UserSerializer()
     paid_for=serializers.IntegerField()
     paid_to=serializers.PrimaryKeyRelatedField(queryset=Accountant.objects.all())
     paid_amount=serializers.IntegerField()
-    date_of_transaction=serializers.DateField()
     short_description=serializers.CharField()
     cheque_no=serializers.CharField(required=False)
-class StudentpaymentsSerializer(serializers.Serializer):
-    student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
-    payment=serializers.PrimaryKeyRelatedField(queryset=Payments.objects.all())
+    discount_type=serializers.ChoiceField(choices=discount_type_c)
+    total_discount_amount=serializers.IntegerField(required=False)
+    discount_description=serializers.CharField()
+    fine_amount=serializers.IntegerField()
+    fine_description=serializers.CharField()
 
-class FeesDueSerializer(serializers.Serializer):
+class StudentAcSerializer(serializers.Serializer):
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
-    fee_type=serializers.IntegerField()
-    ac_start_date=serializers.DateField()
-    rate=serializers.IntegerField() 
-    date=serializers.DateField()
+    payments=serializers.PrimaryKeyRelatedField(queryset=Payments.objects.all())
+
+
 
 class TeacherSalarySerializer(serializers.Serializer):
     teacher=serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
