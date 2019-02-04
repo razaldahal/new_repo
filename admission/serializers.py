@@ -6,6 +6,9 @@ from guardian.models import GUARDIAN_TYPE
 from Section.serializers import SectionSerializer
 from transport.models import Route
 from course.models import Batch,Course
+from accountant.models import payment_type_c,PaymentType,Payments,Accountant,discount_type_c
+from Class.models import Class
+
 choices=(
 		('Father','FATHER'),
 		('Mother','MOTHER'),
@@ -75,7 +78,28 @@ class GuardianSerializer(serializers.Serializer):
 	phone_detail=PhoneSerializer()
 	address_detail=AddressSerializer()
 class TransportAllocationSerializer(serializers.Serializer):
-    route=serializers.PrimaryKeyRelatedField(queryset=Route.objects.all())	
+    route=serializers.PrimaryKeyRelatedField(queryset=Route.objects.all())
+class PaymentTypeSerializer(serializers.Serializer):
+    _class=serializers.PrimaryKeyRelatedField(queryset=Class.objects.all())
+    name=serializers.ChoiceField(choices=payment_type_c)
+    rate=serializers.IntegerField()
+    def get_name(self,obj):
+        return get_choice_string(payment_type_c,obj.name)	
+class PaymentsSerializer(serializers.Serializer):
+    payment_type=PaymentTypeSerializer()
+    paid_method=serializers.IntegerField()
+    paid_by=UserSerializer()
+    paid_for=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
+    paid_to=serializers.PrimaryKeyRelatedField(queryset=Accountant.objects.all())
+    paid_amount=serializers.IntegerField()
+    short_description=serializers.CharField()
+    cheque_no=serializers.CharField(required=False)
+    discount_type=serializers.ChoiceField(choices=discount_type_c)
+    total_discount_amount=serializers.IntegerField(required=False)
+    discount_description=serializers.CharField()
+    fine_amount=serializers.IntegerField()
+    fine_description=serializers.CharField()
+		
 class StudentAdmissionBaseSerializer(serializers.Serializer):
 	user = UserSerializer()
 	user_detail = UserDetailSerializer()
@@ -87,6 +111,7 @@ class StudentAdmissionBaseSerializer(serializers.Serializer):
 	section=SectionSerializer()
 	guardian=GuardianSerializer()
 	#image = serializers.ImageField()
+	student_payment_ac=PaymentsSerializer()
 	transport = TransportAllocationSerializer()
 	father=FatherSerializer()
 	mother=MotherSerializer()

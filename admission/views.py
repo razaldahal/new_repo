@@ -14,6 +14,8 @@ from main.helpers.tuple import get_choice_string
 from Section.models import Section,SectionStudent
 from guardian.models import Guardian,GuardianStudent
 from transport.models import TransportAllocation,Route
+from accountant.models import payment_type_c,PaymentType,Payments,Accountant,discount_type_c,StudentAc
+from Class.models import Class
 class StudentAdmissionViewSet(viewsets.ModelViewSet):
 	queryset = StudentAdmission.objects.all()
 	serializer_class = StudentAdmissionSerializer
@@ -116,7 +118,34 @@ class StudentAdmissionViewSet(viewsets.ModelViewSet):
 			if guardian:
 				GuardianStudent.objects.get_or_create(student_id=student.id,guardian_id=guardian.id)
 			if section:
-				SectionStudent.objects.get_or_create(section_id=section.id,student_id=student.id,roll_no=student.registration_no)	
+				SectionStudent.objects.get_or_create(section_id=section.id,student_id=student.id,roll_no=student.registration_no)
+			pb=data['student_payment_ac']['paid_by']
+			a,b = User.objects.get_or_create(email=pb['email'],defaults={'username':pb['email'],'first_name':pb['first_name'],'last_name':pb['last_name'],'gender':pb['gender'],'type':pb['type']})
+			k=User.objects.get(id=a.id)   	
+			stdp,cr=Payments.objects.get_or_create(payment_type=PaymentType.objects.get_or_create(name=3,_class=Class.objects.get(id=data['student_payment_ac']['payment_type']['_class']),rate=data['student_payment_ac']['payment_type']['rate'])[0],paid_method=data['student_payment_ac']['paid_method'],paid_by=k,paid_for=student,paid_to=Accountant.objects.get(esp_id=data['student_payment_ac']['paid_to']),paid_amount=data['student_payment_ac']['paid_amount'],date_of_transaction=date.today(),discount_type=data['student_payment_ac']['discount_type'],total_discount_amount=data['student_payment_ac']['total_discount_amount'],discount_description=data['student_payment_ac']['discount_description'],fine_amount=data['student_payment_ac']['fine_amount'],fine_description=data['student_payment_ac']['fine_description'],short_description=data['student_payment_ac']['short_description'],cheque_no=data['student_payment_ac']['cheque_no'])
+			rate=stdp.payment_type.rate
+			paid_date=stdp.date_of_transaction
+			paid_amount=stdp.paid_amount
+			discount_type=stdp.discount_type
+			discount_amount=stdp.total_discount_amount
+			fine_amount=stdp.fine_amount
+			total_due=rate-discount_amount+fine_amount-paid_amount
+			if total_due>0:
+				due_amount=total_due
+				credit_amount=0
+				balance=0+due_amount
+			elif total_due<0:
+				due_amount=0
+				credit_amount=0-total_due
+				balance=0+due_amount
+			elif total_due==0:
+				due_amount=0
+				credit_amount=0
+				balance=0            
+
+			stac,c=StudentAc.objects.get_or_create(student=student,payments=stdp,due_amount=due_amount,credit_amount=credit_amount,balance=balance) 
+
+		
 			stdadm,vals=StudentAdmission.objects.get_or_create(student_id=student.id,
 												   defaults={   
 												   'batch':data['batch'],

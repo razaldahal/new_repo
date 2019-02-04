@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from datetime import datetime,date
 import calendar
 from teacher.models import Teacher
+
 class AccountantViewset(viewsets.ModelViewSet):
     queryset=Accountant.objects.all()
     serializer_class=AccountantSerializer
@@ -48,6 +49,120 @@ class AccountantViewset(viewsets.ModelViewSet):
             'esp_id':obj.esp_id}
             output.append(temp) 
         return Response(output)
+class Fee_CategoryViewSet(viewsets.ModelViewSet):
+    serializer_class=FeeCategorySerializer
+    queryset=Fee_Category.objects.all()
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            a,b=Fee_Category.objects.get_or_create(name=data['name'],description=data['description'])
+            if not b:
+                return Response('Category already exists',status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+class Fee_AllocationViewSet(viewsets.ModelViewSet):
+    serializer_class=FeeAllocationSerializer
+    queryset=Fee_Allocation.objects.all()
+
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            if data['_class']==None:
+                for cl in Class.objects.all():
+                    a,b=Fee_Allocation.objects.get_or_create(fee_category=Fee_Category.objects.get(id=data['fee_category']),_class=Class.objects.get(id=cl.id),amount=data['amount'])
+                    if not b:
+                        return Response({"Error":"Fee allocation instance already exists"},status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        continue
+            elif data['_class']:
+                a,b=Fee_Allocation.objects.get_or_create(fee_category=Fee_Category.objects.get(id=data['fee_category']),_class=Class.objects.get(id=data['_class']),amount=data['amount'])
+                if not b:
+                    return Response({"Error":"Fee allocation instance already exists"},status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    pass                           
+            return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)        
+                  
+    def retrieve(self,request,pk):
+        try:
+            obj=Fee_Allocation.objects.get(id=pk)
+        except:
+            return Response({"Error":"Fee allocation object not found"},status=status.HTTP_404_NOT_FOUND)
+        temp={"fee_category":obj.fee_category.name,
+        "class":obj._class.name,
+        "amount":obj.amount}
+        return Response(temp)
+    def update(self,request,pk):
+        try:
+            obj=Fee_Allocation.objects.get(id=pk)
+        except:
+            return Response({"Error":"Fee allocation object not found"},status=status.HTTP_404_NOT_FOUND)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            if data['_class']==None:
+                for cl in Class.objects.all():
+                    obj.fee_category=Fee_Category.objects.get(id=data['fee_category'])
+                    obj._class=Class.objects.get(id=cl.id)
+                    obj.amount=data['amount']
+                    obj.save()
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            return Response({"Detail":[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+
+        
+                
+
+
+
+
+
+
+
+class PaymentTypeViewSet(viewsets.ModelViewSet):
+    serializer_class=PaymentTypeSerializer
+    queryset=PaymentType.objects.all()
+    def create(self,request):
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            pt,c=PaymentType.objects.get_or_create(name=data['name'],_class=Class.objects.get(id=data['_class']),rate=data['rate'])
+            if not c:
+                return Response({'Error':'PaymentType already exists'},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
+    def retrieve(self,request,class_pk):
+        try:
+            obj=PaymentType.objects.get(_class_id=class_pk)
+        except:
+            return Response({'Not found':'Payment Types not registered for given class id'},status=status.HTTP_404_NOT_FOUND)
+        temp={'id':obj,
+        'name':obj.name,
+        'rate':obj.rate,
+        'class':{'name':obj._class.name,
+        'id':obj._class.id}
+        }
+        return Response(temp)                   
+    def update(self,request,class_pk):
+        try:
+            obj=PaymentType.objects.get(_class_id=class_pk)
+        except:
+            return Response({'Not found':'Payment Types not registered for given class id'},status=status.HTTP_404_NOT_FOUND)
+        serializer=self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data=serializer.data
+            obj.name=data['name']
+            obj._class=Class.objects.get(id=data['class'])
+            obj.rate=data['rate']
+            obj.save()
+        return Response(data,status=status.HTTP_200_OK)
 
 class PaymentsViewSet(viewsets.ModelViewSet):
     queryset=Payments.objects.all()
@@ -84,14 +199,14 @@ class PaymentsViewSet(viewsets.ModelViewSet):
              }
             output.append(temp)
         return Response(output)    
-class StudentAcViewSet(viewsets.ViewSet):
+class StudentAcViewSet(viewsets.ModelViewSet):
     queryset=StudentAc.objects.all()
     serializer_class=StudentAcSerializer
 
     def create(self,request):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
-            data=request.data
+            data=serializer.data
             p=Payments.objects.filter(paid_for=Student.objects.get(id=data['student']))
             if p==None:    
                 return Response('No payments instance for this student found')
@@ -151,17 +266,60 @@ class StudentAcViewSet(viewsets.ViewSet):
                                 credit_amount=0
                                 balance=0
 
-                            stac,c=StudentAc.objects.get_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
 
                         elif payment.payment_type.name==1:
 
                             no_of_quarters=((paid_date-pl[i-1].paid_date).month)/4
-                            payable_fee=rate*no_of_months
+                            payable_fee=rate*no_of_quarters
                             total_due=payable_fee-discount_amount+fine_amount+stacc.balance
 
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0+due_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0
 
 
-    
+                        elif payment.payment_type.name==2:
+
+                            no_of_years=((paid_date-pl[i-1].paid_date).month)/12
+                            payable_fee=rate*no_of_years
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0+due_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0
+                        stac,c=StudentAc.objects.update_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+                return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)   
+    def list(self,request):
+        objects=StudentAc.objects.all()
+        output=[]
+        for obj in objects:
+            temp={'id':obj.id,
+            'student':obj.student.user.first_name+" "+obj.student.user.last_name,
+            'payment_details':{'due_amount':obj.due_amount,
+            'credit_amount':obj.credit_amount,
+            'balance':obj.balance}
+            }
+            output.append(temp)
+        return Response(output)    
 
 
 class TeacherSalaryViewset(viewsets.ModelViewSet):

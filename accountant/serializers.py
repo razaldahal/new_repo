@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from admission.serializers import UserSerializer
-from .models import Payments,Accountant,payment_type_c,PaymentType,get_choice_string,Class,discount_type_c
+from .models import Payments,Accountant,payment_type_c,PaymentType,get_choice_string,Class,discount_type_c,Fee_Allocation,Fee_Category
 from student.models import Student
 from teacher.models import Teacher
 class AccountantSerializer(serializers.Serializer):
@@ -17,7 +17,7 @@ class PaymentsSerializer(serializers.Serializer):
     payment_type=serializers.PrimaryKeyRelatedField(queryset=PaymentType.objects.all())
     paid_method=serializers.IntegerField()
     paid_by=UserSerializer()
-    paid_for=serializers.IntegerField()
+    paid_for=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
     paid_to=serializers.PrimaryKeyRelatedField(queryset=Accountant.objects.all())
     paid_amount=serializers.IntegerField()
     short_description=serializers.CharField()
@@ -27,10 +27,18 @@ class PaymentsSerializer(serializers.Serializer):
     discount_description=serializers.CharField()
     fine_amount=serializers.IntegerField()
     fine_description=serializers.CharField()
+class FeeCategorySerializer(serializers.Serializer):
+    name=serializers.CharField()
+    description=serializers.CharField()
+
+class FeeAllocationSerializer(serializers.Serializer):
+    fee_category=serializers.PrimaryKeyRelatedField(queryset=Fee_Category.objects.all())
+    _class=serializers.PrimaryKeyRelatedField(queryset=Class.objects.all(),required=False)
+    amount=serializers.IntegerField()
 
 class StudentAcSerializer(serializers.Serializer):
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
-    payments=serializers.PrimaryKeyRelatedField(queryset=Payments.objects.all())
+    
 
 
 
