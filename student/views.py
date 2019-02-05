@@ -24,6 +24,30 @@ def generate_username(input_username):
         return '{}_{}'.format(input_username,digit)
 
 
+def get_student_detail(obj):
+    f = obj.guardian.filter(type='father')
+    if f:
+        obj.father = f.first()
+    m = obj.guardian.filter(type='mother')
+    if m:
+        obj.mother = m.first()
+
+    c = ContentType.objects.get_for_model(obj)
+    a = Address.objects.filter(content_type=c, object_id=obj.id)
+    if a:
+        obj.address = a.first()
+
+    se = StudentEnroll.objects.filter(student=obj, academic_year=get_current_year())
+    if se:
+        se = se.first()
+        obj.admission_date = se.admission_date
+        obj.course = se._class.course_id
+        obj.course_name = se._class.course.name
+        obj._class = se._class_id
+        obj.class_name = se._class.name
+        obj.section = se.section_id
+    return obj
+
 class StudentAdmissionViewSet(ModelViewSet):
 
     queryset = Student.objects.all()
@@ -53,9 +77,9 @@ class StudentAdmissionViewSet(ModelViewSet):
                 )
 
 
-            student = {'user':user.id, 'registration_no':data['registration_no']}
+            student = {'user_id':user.id, 'registration_no':data['registration_no']}
             student = StudentPostSerializer(data=student)
-            if student.is_valid():
+            if not student.is_valid():
                 raise serializers.ValidationError({'Detail':[student.errors]})
 
             student = student.save()
@@ -84,23 +108,22 @@ class StudentAdmissionViewSet(ModelViewSet):
                     )
 
             year = get_current_year()
-            if year:
-                year = year.name
-            else:
-                year = ''
+            
 
             params = {
                 'academic_year':year,
-                'student':student,
-                '_class':data['_class']
+                'student':student
+                
             }
-            defaults = {}
+            defaults = {
+                '_class_id':data['_class']
+            }
             if 'section' in data:
-                defaults['section'] = data['section']
+                defaults['section_id'] = data['section']
             if 'admission_date' in data:
                 defaults['admission_date'] = data['admission_date']
 
-            StudentEnroll.objects.create(**params, defaults={**defaults})
+            StudentEnroll.objects.get_or_create(**params, defaults={**defaults})
             return Response(data)
 
         else:
@@ -111,12 +134,12 @@ class StudentAdmissionViewSet(ModelViewSet):
 class StudentViewSet(ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    http_method_names = ['get', 'post', 'put', 'delete']
+    http_method_names = ['get', 'put']
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         if self.request.method in ['POST', 'PUT']:
-            serializer_class = StudentPostSerializer
+            serializer_class = StudentAdmissionSerializer
 
         return serializer_class(*args, **kwargs)
 
@@ -135,13 +158,70 @@ class StudentViewSet(ModelViewSet):
         else:
             raise serializers.ValidationError({'Detail':[serializer.errors]})
 
+    def list(self, request, *args, **kwargs):
+        students = []
+        objects = self.queryset
+        section_id = request.GET.get('section_id', False)
+        if section_id:
+            objects = []
+            _objects = StudentEnroll.objects.filter(section_id=section_id, academic_year=get_current_year())
+            for obj in _objects:
+                objects.append(obj.student)
+
+        for obj in objects:
+            students.append(get_student_detail(obj))
+
+        students = StudentGetSerializer(students, many=True).data
+        return Response(students)
+
+    def retrieve(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj = get_student_detail(obj)
+        student = StudentGetSerializer(obj).data
+        return Response(student)
+
+    def update(self, request, pk):
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.data
+            
+            UserPostSerializer().update(instance.user, data['user'])
+            address = Address.objects.get(id=data['address']['id'])
+            AddressSerializer().update(address, data['address'])
+            father = Guardian.objects.get(id=data['father']['id'])
+            GuardianSerializer().update(father, data['father'])
+            mother = Guardian.objects.get(id=data['mother']['id'])
+            GuardianSerializer().update(mother, data['mother'])
+
+            return Response(data)
+
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+
+
+
+class StudentImageViewSet(APIView):
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+        print (request.FILES)
+        if 'file' in request.FILES and 'student_id' in request.POST:
+            file = request.FILES['file']
+            student = Student.objects.get(id=int(request.POST['student_id']))
+            student.user.profile_pic = file
+            student.user.save()
+
+        return Response({})
+
 def get_search_params(request):
     params = request.GET
     filter_params = {}
-    whitelist_params = ['name']
+    whitelist_params = ['q']
     for k,v in params.items():
-    	if k == 'name':
-    		filter_params['user__first_name__iexact'.format(k)] = v
+    	if k == 'q' and len(v) > 2:
+    		filter_params['user__first_name__icontains'.format(k)] = v
     return filter_params
 
 
@@ -151,24 +231,30 @@ class StudentSearchViewSet(APIView):
         output = []
         filter_params = get_search_params(self.request)
         if filter_params:
-            students = Student.objects.filter(**filter_params)
-            
-            students = StudentSerializer(students, many=True)
+            print(filter_params)
+            students = []
+            objects = Student.objects.filter(**filter_params)
+            for obj in objects:
+                obj = get_student_detail(obj)
+
+                students.append(obj)
+
+            students = StudentGetSerializer(students, many=True)
             output = students.data
         return output
 
     @swagger_auto_schema(manual_parameters=[
         
-        openapi.Parameter('name', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+        openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
         ])
     def get(self, request, format=None):
         """
         Student search
         """
-        #output = self.search()
-        output = [
-        	{'id':1 , 'registration_no':'034490', 'user':{'first_name':'ashish', 'last_name':'belwase'}},
-            {'id':2 , 'registration_no':'034491', 'user':{'first_name':'ram', 'last_name':'khanal'}}
-        ]
+        output = self.search()
+        # output = [
+        # 	{'id':1 , 'registration_no':'034490', 'user':{'first_name':'ashish', 'last_name':'belwase'}},
+        #     {'id':2 , 'registration_no':'034491', 'user':{'first_name':'ram', 'last_name':'khanal'}}
+        # ]
         return Response(output)
 

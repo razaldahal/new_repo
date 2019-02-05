@@ -5,7 +5,7 @@ from main.models import BaseModel, User
 from academic.models import AcademicYear, Class, Section
 
 class Student(BaseModel):
-    user = models.ForeignKey(User,on_delete=models.CASCADE, unique=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE, unique=True)
     registration_no = models.CharField(max_length=20, unique=True)
 
     class Meta:
@@ -16,7 +16,7 @@ class Student(BaseModel):
         return self.registration_no
 
 class Guardian(BaseModel):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='guardian')
     type=models.CharField(max_length=10)
     name=models.CharField(max_length=100)
     mobile=models.CharField(max_length=20, null=True, blank=True)

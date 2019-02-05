@@ -31,8 +31,9 @@ urlpatterns = [
     path('api/dashboard/',include('dashboard.urls')),
     path('api/academic/',include('academic.urls')),
     path('api/student/',include('student.urls')),
-
-    # path('api/library/',include('library.urls')),
+    path('api/library/',include('library.urls')),
+    path('api/transport/',include('transport.urls')),
+    
     # path('api/accountant/',include('accountant.urls')),
     # path('api/admission/',include('admission.urls')),
     # # path('api/class/',include('Class.urls')),

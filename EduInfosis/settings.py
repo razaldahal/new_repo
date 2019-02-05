@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'academic',
     'student',
     'dashboard',
+    'library',
+    'transport',
 
     #'admission',
     #'course',
@@ -153,8 +155,8 @@ AUTH_USER_MODEL = "main.User"
 
 #for image
 
-MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'uploaded_media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '.', 'media')
+MEDIA_URL = '/api/media/'
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',

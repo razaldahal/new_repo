@@ -9,14 +9,15 @@ from .views import *
 
 router = routers.SimpleRouter()
 
-router.register(r'admission', StudentAdmissionViewSet)
-router.register(r'', StudentViewSet)
+router.register(r'category', CategoryViewSet)
+router.register(r'book', BookViewSet)
 
+router.register(r'issue', IssueViewSet)
+router.register(r'return', ReturnViewSet)
 
 urlpatterns = [
-	url(r'search', StudentSearchViewSet.as_view(), name='student-search'),
-	url(r'image', StudentImageViewSet.as_view(), name='student-image'),
 
+	url(r'search', BookSearchViewSet.as_view(), name='book-search'),
 	url(r'^', include(router.urls)),
 
 ]

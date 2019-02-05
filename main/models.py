@@ -59,6 +59,8 @@ class User(BaseModel, AbstractUser):
     citizenship_no = models.CharField(max_length=10,null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     current_address = models.TextField()
+    phone = models.CharField(max_length=12, null=True, blank=True)
+    profile_pic = models.ImageField(upload_to = 'profile_pics/', null=True, blank=True)
 
     class Meta:
         db_table = 'main_user'
