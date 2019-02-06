@@ -21,7 +21,7 @@ class EventTaskSerializer(serializers.Serializer):
     status=serializers.CharField()
     priority = serializers.IntegerField()
     date = serializers.DateField()
-    user_type = serializers.ChoiceField(choices=USER_TYPE)
+    user = serializers.ChoiceField(choices=USER_TYPE)
     student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
 
 

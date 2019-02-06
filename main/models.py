@@ -53,7 +53,7 @@ class Phone(BaseModel):
 	content_object = fields.GenericForeignKey('content_type', 'object_id')
 
 	type = models.IntegerField(choices=TYPE)
-	number = models.IntegerField()
+	number = models.CharField(max_length=15)
 class Parent(BaseModel):
 	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
 	object_id = models.PositiveIntegerField(null=True)

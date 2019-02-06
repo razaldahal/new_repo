@@ -46,7 +46,7 @@ class UserDetailSerializer(serializers.Serializer):
 
 class PhoneSerializer(serializers.Serializer):
 	type = serializers.IntegerField(default=1)
-	number = serializers.IntegerField(required=True)
+	number = serializers.CharField(required=True)
 
 
 class AddressSerializer(serializers.Serializer):

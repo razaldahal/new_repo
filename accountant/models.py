@@ -22,13 +22,6 @@ class Accountant(BaseModel):
     esp_id=models.SlugField(verbose_name='accountant_id',primary_key=True)
    
 
-class Fee_Category(BaseModel):
-    name=models.CharField(max_length=50)
-    description=models.TextField(blank=True)
-class Fee_Allocation(BaseModel):
-    fee_category=models.ForeignKey(Fee_Category,on_delete=models.CASCADE)
-    _class=models.ForeignKey(Class,on_delete=models.CASCADE)
-    amount=models.IntegerField()
 
 
 
@@ -75,6 +68,13 @@ class StudentAc(BaseModel):
     credit_amount=models.IntegerField(default=None)
     balance=models.IntegerField(default=None)
 
+class Fee_Category(BaseModel):
+    name=models.CharField(max_length=50)
+    description=models.TextField(blank=True)
+class Fee_Allocation(BaseModel):
+    fee_category=models.ForeignKey(Fee_Category,on_delete=models.CASCADE)
+    _class=models.ForeignKey(Class,on_delete=models.CASCADE)
+    amount=models.IntegerField()
 
 
 class TeacherSalary(BaseModel):

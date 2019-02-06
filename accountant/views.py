@@ -140,12 +140,9 @@ class StudentAcViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            p=Payments.objects.filter(paid_for=Student.objects.get(id=data['student']))
+            p=Payments.objects.filter(paid_for=Student.objects.get(id=data['student'])).order_by('date_of_transaction')
             _class=SectionStudent.objects.get(student=Student.objects.get(id=data['student'])).section._class
-            fa=Fee_Allocation.objects.filter(_class=_class)
-            for obj in fa:
-                tam+=obj.amount
-            totam=tam    
+                
 
 
             if p==None:    

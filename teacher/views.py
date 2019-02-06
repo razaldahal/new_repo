@@ -68,17 +68,18 @@ class TeacherViewSet(viewsets.ModelViewSet):
 		output = []
 
 		for obj in objects:
-    			temp ={
+			temp ={
 					'id':obj.id,
-					'name':obj.user.first_name + ' ' + obj.user.last_name
+					'name':obj.user.first_name +' '+ obj.user.last_name
+					
 					}
-    			output.append(temp)
+
     			
 				
-			# user = obj.user
-			# c = ContentType.objects.get_for_model(user)
-			# address = Address.objects.get(content_type=c,object_id=user.id)
-			# phone = Phone.objects.get(content_type=c,object_id=user.id)
+			user = obj.user
+			c = ContentType.objects.get_for_model(user)
+			address = Address.objects.get(content_type=c,object_id=user.id)
+			phone = Phone.objects.get(content_type=c,object_id=user.id)
 
 			# temp={
 			# 'id':obj.user.id
@@ -86,13 +87,10 @@ class TeacherViewSet(viewsets.ModelViewSet):
 			# }
 
 			# temp['user'] = UserGetSerializer(user).data
-			# temp['address_detail'] = AddressSerializer(address).data
-			# temp['phone_detail'] = PhoneSerializer(phone).data
+			temp['address_detail'] = AddressSerializer(address).data
+			temp['phone_detail'] = PhoneSerializer(phone).data
 
-			
-
-
-
+			output.append(temp)
 		return Response(output)
 
 
