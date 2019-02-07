@@ -58,15 +58,17 @@ class Payments(BaseModel):
     discount_description=models.TextField(blank=True)    
     fine_amount=models.IntegerField(default=None)
     fine_description=models.TextField(blank=True)
-    
+    time=models.DateTimeField(auto_now_add=True)
 
-    
+    class Meta:
+        unique_together=(('date','time'),'paid_amount'))
 class StudentAc(BaseModel):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     payments=models.ForeignKey(Payments,on_delete=models.CASCADE)
     due_amount=models.IntegerField(default=None)
     credit_amount=models.IntegerField(default=None)
     balance=models.IntegerField(default=None)
+
 
 class Fee_Category(BaseModel):
     name=models.CharField(max_length=50)

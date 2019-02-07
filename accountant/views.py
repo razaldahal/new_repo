@@ -4,10 +4,10 @@ from .serializers import *
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 # Create your views here.
-from datetime import datetime,date
+from datetime import datetime,date,time,timezone
 import calendar
 from teacher.models import Teacher
-
+from Section.models import SectionStudent,Section
 class AccountantViewset(viewsets.ModelViewSet):
     queryset=Accountant.objects.all()
     serializer_class=AccountantSerializer
@@ -71,12 +71,12 @@ class PaymentTypeViewSet(viewsets.ModelViewSet):
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)
-    def retrieve(self,request,class_pk):
+    def retrieve(self,request,pk):
         try:
-            obj=PaymentType.objects.get(_class_id=class_pk)
+            obj=PaymentType.objects.get(_class_id=pk)
         except:
             return Response({'Not found':'Payment Types not registered for given class id'},status=status.HTTP_404_NOT_FOUND)
-        temp={'id':obj,
+        temp={'id':obj.id,
         'name':obj.name,
         'rate':obj.rate,
         'class':{'name':obj._class.name,
@@ -108,13 +108,18 @@ class PaymentsViewSet(viewsets.ModelViewSet):
             pf=data['paid_for']
             x=Student.objects.get(id=pf)
             a,b = User.objects.get_or_create(email=pb['email'],defaults={'username':pb['email'],'first_name':pb['first_name'],'last_name':pb['last_name'],'gender':pb['gender'],'type':pb['type']})
-            k=User.objects.get(id=a.id)    
-            c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_typr'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'])
+            k=User.objects.get(id=a.id)
+            try:
+                paym=Payments.objects.get(paid_for=x)
+            except:
+                c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_type'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'],time=timezone.now())
             
-            if not d:
-                return Response('some error')
-            else:
-                return Response(data,status=status.HTTP_201_CREATED)
+                if not d:
+                    return Response('some error')
+                else:
+                    return Response(data,status=status.HTTP_201_CREATED)
+
+            return Response(data,status=status.HTTP_202_ACCEPTED)
         else:
             raise serializers.ValidationError({'Detail':[serializer.errors]})
 
@@ -123,7 +128,8 @@ class PaymentsViewSet(viewsets.ModelViewSet):
         objects=self.queryset
         output=[]
         for obj in objects:
-            temp={'payment_type':obj.payment_type,
+            temp={'id':obj.id,
+            'payment_type':obj.payment_type.name,
             'paid_method':obj.paid_method,
             'paid_by':obj.paid_by.first_name+" "+obj.paid_by.last_name,
             'paid_for':obj.paid_for.user.first_name,
@@ -148,9 +154,10 @@ class StudentAcViewSet(viewsets.ModelViewSet):
             if p==None:    
                 return Response('No payments instance for this student found')
             else:
-                pv=p.values()
-                pl=[pay for pay in pv]
-                num=pl.count
+                #pv=p.values()
+                #pl=[pay for pay in pv]
+                pl=p
+                num=len(pl)
                 for i in range(num):
                     if i==0:
                         payment=pl[i]
@@ -179,14 +186,14 @@ class StudentAcViewSet(viewsets.ModelViewSet):
                     elif i>0:
                         payment=pl[i]
                         stacc=StudentAc.objects.get(payments=pl[i-1])
-                        rate=payment.rate
-                        paid_date=payment.paid_date
+                        rate=payment.payment_type.rate
+                        paid_date=payment.date_of_transaction
                         paid_amount=payment.paid_amount
                         discount_type=payment.discount_type
-                        discount_amount=payment.discount_amount
+                        discount_amount=payment.total_discount_amount
                         fine_amount=payment.fine_amount
                         if payment.payment_type.name==0:
-                            no_of_months=(paid_date-pl[i-1].paid_date).month
+                            no_of_months=(paid_date.month-pl[i-1].date_of_transaction.month)
                             payable_fee=rate*no_of_months
                             total_due=payable_fee-discount_amount+fine_amount+stacc.balance
                             
@@ -241,8 +248,13 @@ class StudentAcViewSet(viewsets.ModelViewSet):
                                 due_amount=0
                                 credit_amount=0
                                 balance=0
-                        balance        
-                        stac,c=StudentAc.objects.update_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+                                
+                        stac,c=StudentAc.objects.get(student=Student.objects.get(id=data['student']))
+                        stac.payment=payment
+                        stac.due_amount=due_amount
+                        stac.credit_amount=credit_amount
+                        stac.balance=balance
+                        stac.save()
                 return Response(data,status=status.HTTP_201_CREATED)
         else:
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)   
@@ -254,7 +266,8 @@ class StudentAcViewSet(viewsets.ModelViewSet):
             'student':obj.student.user.first_name+" "+obj.student.user.last_name,
             'payment_details':{'due_amount':obj.due_amount,
             'credit_amount':obj.credit_amount,
-            'balance':obj.balance}
+            'balance':obj.balance,
+            'misc_fee_allocated':obj.balance-obj.due_amount}
             }
             output.append(temp)
         return Response(output) 
@@ -301,7 +314,7 @@ class Fee_AllocationViewSet(viewsets.ModelViewSet):
                                 except:
                                     return Response('Cannot assign amount to student account because student account does not exist')
                                 newbal=stdac.balance+a.amount
-                                stdac.update(balance=newbal)
+                                stdac.balance=newbal
                                 stdac.save()    
 
 
@@ -311,7 +324,22 @@ class Fee_AllocationViewSet(viewsets.ModelViewSet):
                 if not b:
                     return Response({"Error":"Fee allocation instance already exists"},status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    pass                           
+                    sl=Section.objects.filter(_class=Class.objects.get(id=data['_class']))
+                        # slv=sl.values()
+                        # slvl=[val for val in slv]
+                    for obj in sl:
+                        scstd=SectionStudent.objects.filter(section=obj)
+                        for scs in scstd:
+                            std=scs.student
+                            try:
+                                stdac=StudentAc.objects.get(student=std)
+                            except:
+                                return Response('Cannot assign amount to student account because student account does not exist')
+                            newbal=stdac.balance+a.amount
+                            
+                            stdac.balance=newbal
+                            stdac.save()
+                        continue                           
             return Response(data,status=status.HTTP_201_CREATED)
         else:
             return Response({'Detail':[serializer.errors]},status=status.HTTP_400_BAD_REQUEST)        
