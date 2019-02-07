@@ -266,9 +266,6 @@ class ReportViewset(viewsets.ViewSet):
                 addv = Address.objects.filter(**qr)
                 for obj in addv:
                     user_ids = [obj.object_id]
-
-
-                # userval=[users for users in userv]
                     if user_ids != []:
                         for user in user_ids:
                             print(user)
@@ -278,55 +275,56 @@ class ReportViewset(viewsets.ViewSet):
                             try:    
                                 stdt = Student.objects.get(user_id=usr.id)
                             except:
-                                return Response('student does not exist')
+                                continue
                             print(stdt.id)
-                        try:
-                            stdtadm = StudentAdmission.objects.get(
-                                student_id=stdt.id)
-                        except:
-                            return Response('student exists but it is not admitted')
-                        bat = stdtadm.batch
-                        print(bat)
-                        print(r.get('batch'))
-                        if bat == int(r.get('batch')):
-                            print('True')
-                            lst = []
-                            c = ContentType.objects.get_for_model(usr)
-                            address = Address.objects.get(
-                                content_type=c, object_id=usr.id)
-                            phone = Phone.objects.get(
-                                content_type=c, object_id=usr.id, type=1)
-                            father = Parent.objects.get(
-                                content_type=c, object_id=usr.id, type='Father')
-                            mother = Parent.objects.get(
-                                content_type=c, object_id=usr.id, type='Mother')
-                            tmp = {}
-                            tmp['name'] = usr.first_name+" "+usr.last_name
-                            tmp['email'] = usr.email
-                            tmp['address_detail'] = AddressSerializer(
-                                address).data
-                            phone_data = PhoneSerializer(phone).data
-                            tmp['phone'] = phone_data
-                            tmp['parent_details'] = {
-                                'father': FatherSerializer(father).data,
-         			                    'mother': MotherSerializer(mother).data
-                            }
-                            std = stdt
-                            stdtadm = stdtadm
-                            tmp['admission_date'] = stdtadm.admission_date
                             try:
-                                gstd = GuardianStudent.objects.get(
-                                    student_id=std.id)
+                                stdtadm = StudentAdmission.objects.get(
+                                    student_id=stdt.id)
                             except:
-                                return Response('Guardian student object for the student does not exist')
-
-                            grd = gstd.guardian.user
-                            gc = ContentType.objects.get_for_model(grd)
-                            gaddress = Address.objects.get(
-                                content_type=gc, object_id=grd.id)
-                            gphone = Phone.objects.get(
-                                content_type=gc, object_id=grd.id, type=1)
-                            tmp['guardian_details'] = {'contact': PhoneSerializer(gphone).data,
+                                #return Response('student exists but it is not admitted')
+                                continue
+                            bat = stdtadm.batch
+                            print(bat)
+                            print(r.get('batch'))
+                            if bat == int(r.get('batch')):
+                                print('True')
+                                lst = []
+                                c = ContentType.objects.get_for_model(usr)
+                                address = Address.objects.get(
+                                    content_type=c, object_id=usr.id)
+                                phone = Phone.objects.get(
+                                    content_type=c, object_id=usr.id, type=1)
+                                father = Parent.objects.get(
+                                    content_type=c, object_id=usr.id, type='Father')
+                                mother = Parent.objects.get(
+                                    content_type=c, object_id=usr.id, type='Mother')
+                                tmp = {}
+                                tmp['name'] = usr.first_name+" "+usr.last_name
+                                tmp['email'] = usr.email
+                                tmp['address_detail'] = AddressSerializer(
+                                    address).data
+                                phone_data = PhoneSerializer(phone).data
+                                tmp['phone'] = phone_data
+                                tmp['parent_details'] = {
+                                    'father': FatherSerializer(father).data,
+         			                    'mother': MotherSerializer(mother).data
+                                    }
+                                std = stdt
+                                stdtadm = stdtadm
+                                tmp['admission_date'] = stdtadm.admission_date
+                                try:
+                                    gstd = GuardianStudent.objects.get(
+                                        student_id=std.id)
+                                except:
+                                    return Response('Guardian student object for the student does not exist')
+                                print(gstd)
+                                grd = gstd.guardian.user
+                                gc = ContentType.objects.get_for_model(grd)
+                                gaddress = Address.objects.get(
+                                    content_type=gc, object_id=grd.id)
+                                gphone = Phone.objects.get(
+                                    content_type=gc, object_id=grd.id, type=1)
+                                tmp['guardian_details'] = {'contact': PhoneSerializer(gphone).data,
                                                        'address': AddressSerializer(gaddress).data,
                                                        'name': grd.first_name+" "+grd.last_name}
                             # try:
@@ -336,11 +334,11 @@ class ReportViewset(viewsets.ViewSet):
                             # clas=ss.section._class.name
                             # tmp['class']=clas
 
-                            lst.append(tmp)
-                        else:
-                            return Response([])
-                else:
-                    return Response([])
+                                lst.append(tmp)
+                            else:
+                                return Response([])
+                    else:
+                        return Response([])
 
             res = lst
         return Response(res)
