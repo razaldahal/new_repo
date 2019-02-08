@@ -9,8 +9,10 @@ class AccountantSerializer(serializers.Serializer):
 
 class PaymentTypeSerializer(serializers.Serializer):
     _class=serializers.PrimaryKeyRelatedField(queryset=Class.objects.all())
-    name=serializers.ChoiceField(choices=payment_type_c)
+    name=serializers.CharField()
     rate=serializers.IntegerField()
+    description=serializers.CharField()
+    type=serializers.ChoiceField(choices=payment_type_c)
     def get_name(self,obj):
         return get_choice_string(payment_type_c,obj.name)
 class PaymentsSerializer(serializers.Serializer):
@@ -27,14 +29,7 @@ class PaymentsSerializer(serializers.Serializer):
     discount_description=serializers.CharField()
     fine_amount=serializers.IntegerField()
     fine_description=serializers.CharField()
-class FeeCategorySerializer(serializers.Serializer):
-    name=serializers.CharField()
-    description=serializers.CharField()
 
-class FeeAllocationSerializer(serializers.Serializer):
-    fee_category=serializers.PrimaryKeyRelatedField(queryset=Fee_Category.objects.all())
-    _class=serializers.PrimaryKeyRelatedField(queryset=Class.objects.all(),required=False)
-    amount=serializers.IntegerField()
 
 class StudentAcSerializer(serializers.Serializer):
     student=serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())

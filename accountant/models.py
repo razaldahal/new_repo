@@ -30,6 +30,7 @@ class PaymentType(BaseModel):
     name=models.IntegerField(choices=payment_type_c)
     _class=models.ForeignKey(Class,on_delete=models.CASCADE)
     rate=models.IntegerField()
+    description=models.TextField()
     def get_name(self,obj):
         return get_choice_string(payment_type_c,obj.name)
 
