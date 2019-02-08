@@ -274,7 +274,7 @@ class StudentAcViewSet(viewsets.ModelViewSet):
 
                         elif payment.payment_type.name==2:
 
-                            no_of_years=(paid_date.month-pl[i-1].paid_date.month)/12
+                            no_of_years=(paid_date.year-pl[i-1].paid_date.year)
                             payable_fee=rate*no_of_years
                             total_due=payable_fee-discount_amount+fine_amount+stacc.balance-paid_amount
                             if total_due>0:
