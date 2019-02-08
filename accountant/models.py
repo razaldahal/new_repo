@@ -8,7 +8,8 @@ payment_type_c=(
               (0,'MONTHLY'),
               (1,'TERMINAL'),
               (2,'ANNUAL'),
-              (3,'ADMISSION')
+              (3,'ADMISSION'),
+              (4,'OTHER_FEE')
               )
 discount_type_c=(
             (0,'Scholarship'),
@@ -61,7 +62,7 @@ class Payments(BaseModel):
     time=models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together=(('date','time'),'paid_amount'))
+        unique_together=('date_of_transaction','time')
 class StudentAc(BaseModel):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     payments=models.ForeignKey(Payments,on_delete=models.CASCADE)

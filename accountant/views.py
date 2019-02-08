@@ -4,7 +4,9 @@ from .serializers import *
 from rest_framework import viewsets,status
 from rest_framework.response import Response
 # Create your views here.
-from datetime import datetime,date,time,timezone
+from datetime import datetime,date
+
+
 import calendar
 from teacher.models import Teacher
 from Section.models import SectionStudent,Section
@@ -64,7 +66,7 @@ class PaymentTypeViewSet(viewsets.ModelViewSet):
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
             data=serializer.data
-            pt,c=PaymentType.objects.get_or_create(name=data['name'],_class=Class.objects.get(id=data['_class']),rate=data['rate'])
+            pt,c=PaymentType.objects.update_or_create(name=data['name'],_class=Class.objects.get(id=data['_class']),rate=data['rate'])
             if not c:
                 return Response({'Error':'PaymentType already exists'},status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -79,13 +81,13 @@ class PaymentTypeViewSet(viewsets.ModelViewSet):
         temp={'id':obj.id,
         'name':obj.name,
         'rate':obj.rate,
-        'class':{'name':obj._class.name,
-        'id':obj._class.id}
+        'class':obj._class.name,
+        'id':obj._class.id
         }
         return Response(temp)                   
-    def update(self,request,class_pk):
+    def update(self,request,pk):
         try:
-            obj=PaymentType.objects.get(_class_id=class_pk)
+            obj=PaymentType.objects.get(_class_id=pk)
         except:
             return Response({'Not found':'Payment Types not registered for given class id'},status=status.HTTP_404_NOT_FOUND)
         serializer=self.get_serializer(data=request.data)
@@ -109,15 +111,18 @@ class PaymentsViewSet(viewsets.ModelViewSet):
             x=Student.objects.get(id=pf)
             a,b = User.objects.get_or_create(email=pb['email'],defaults={'username':pb['email'],'first_name':pb['first_name'],'last_name':pb['last_name'],'gender':pb['gender'],'type':pb['type']})
             k=User.objects.get(id=a.id)
-            try:
-                paym=Payments.objects.get(paid_for=x)
-            except:
-                c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_type'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'],time=timezone.now())
+            
+            paym=Payments.objects.filter(paid_for=x)
+            if paym==None:
+                c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_type'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'],time=datetime.now())
             
                 if not d:
                     return Response('some error')
                 else:
-                    return Response(data,status=status.HTTP_201_CREATED)
+                    return Response(data,status=status.HTTP_201_CREATED)    
+            else:        
+                c,d = Payments.objects.get_or_create(payment_type=PaymentType.objects.get(id=data['payment_type']),paid_method=data['paid_method'],paid_by=k,paid_for=x,paid_to=Accountant.objects.get(esp_id=data['paid_to']),paid_amount=data['paid_amount'],date_of_transaction=date.today(),discount_type=data['discount_type'],total_discount_amount=data['total_discount_amount'],discount_description=data['discount_description'],fine_amount=data['fine_amount'],fine_description=data['fine_description'],short_description=data['short_description'],cheque_no=data['cheque_no'],time=datetime.now())
+
 
             return Response(data,status=status.HTTP_202_ACCEPTED)
         else:
@@ -157,31 +162,67 @@ class StudentAcViewSet(viewsets.ModelViewSet):
                 #pv=p.values()
                 #pl=[pay for pay in pv]
                 pl=p
+                print(pl)
                 num=len(pl)
+                print(num)
                 for i in range(num):
                     if i==0:
                         payment=pl[i]
-                        rate=payment.payment_type.rate
-                        paid_date=payment.date_of_transaction
-                        paid_amount=payment.paid_amount
-                        discount_type=payment.discount_type
-                        discount_amount=payment.total_discount_amount
-                        fine_amount=payment.fine_amount
-                        total_due=rate-discount_amount+fine_amount-paid_amount
-                        if total_due>0:
-                            due_amount=total_due
-                            credit_amount=0
-                            balance=0+due_amount
-                        elif total_due<0:
-                            due_amount=0
-                            credit_amount=0-total_due
-                            balance=0-credit_amount
-                        elif total_due==0:
-                            due_amount=0
-                            credit_amount=0
-                            balance=0
+                        pid=payment.id
+                        print(payment)
+                        if pid==1:
+                            rate=payment.payment_type.rate
+                            paid_date=payment.date_of_transaction
+                            paid_amount=payment.paid_amount
+                            discount_type=payment.discount_type
+                            discount_amount=payment.total_discount_amount
+                            fine_amount=payment.fine_amount
+                            total_due=rate-discount_amount+fine_amount-paid_amount
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0-credit_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0
 
-                        stac,c=StudentAc.objects.get_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+                            stac,c=StudentAc.objects.update_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+                        elif pid>1:
+                            rate=payment.payment_type.rate
+                            paid_date=payment.date_of_transaction
+                            paid_amount=payment.paid_amount
+                            discount_type=payment.discount_type
+                            discount_amount=payment.total_discount_amount
+                            fine_amount=payment.fine_amount
+                            total_due=rate-discount_amount+fine_amount-paid_amount                            
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0-credit_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0
+                            try:                                                                
+                                stac=StudentAc.objects.get(student=Student.objects.get(id=data['student']))
+                            except:
+                                stac,c=StudentAc.objects.update_or_create(student=Student.objects.get(id=data['student']),payments=payment,due_amount=due_amount,credit_amount=credit_amount,balance=balance)           
+
+
+                            stac.payments=payment
+                            stac.due_amount=due_amount
+                            stac.credit_amount=credit_amount
+                            stac.balance=balance
+                            stac.save()
 
                     elif i>0:
                         payment=pl[i]
@@ -195,7 +236,7 @@ class StudentAcViewSet(viewsets.ModelViewSet):
                         if payment.payment_type.name==0:
                             no_of_months=(paid_date.month-pl[i-1].date_of_transaction.month)
                             payable_fee=rate*no_of_months
-                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance-paid_amount
                             
                             if total_due>0:
                                 due_amount=total_due
@@ -213,9 +254,9 @@ class StudentAcViewSet(viewsets.ModelViewSet):
 
                         elif payment.payment_type.name==1:
 
-                            no_of_quarters=((paid_date-pl[i-1].paid_date).month)/4
+                            no_of_quarters=(paid_date.month-pl[i-1].paid_date.month)/4
                             payable_fee=rate*no_of_quarters
-                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance-paid_amount
 
                             if total_due>0:
                                 due_amount=total_due
@@ -233,9 +274,9 @@ class StudentAcViewSet(viewsets.ModelViewSet):
 
                         elif payment.payment_type.name==2:
 
-                            no_of_years=((paid_date-pl[i-1].paid_date).month)/12
+                            no_of_years=(paid_date.month-pl[i-1].paid_date.month)/12
                             payable_fee=rate*no_of_years
-                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance
+                            total_due=payable_fee-discount_amount+fine_amount+stacc.balance-paid_amount
                             if total_due>0:
                                 due_amount=total_due
                                 credit_amount=0
@@ -248,9 +289,25 @@ class StudentAcViewSet(viewsets.ModelViewSet):
                                 due_amount=0
                                 credit_amount=0
                                 balance=0
+                        elif payment.payment_type.name==4:
+
+                            total_due=stacc.balance-discount_amount+fine_amount-paid_amount
+
+                            if total_due>0:
+                                due_amount=total_due
+                                credit_amount=0
+                                balance=0+due_amount
+                            elif total_due<0:
+                                due_amount=0
+                                credit_amount=0-total_due
+                                balance=0-credit_amount
+                            elif total_due==0:
+                                due_amount=0
+                                credit_amount=0
+                                balance=0                                
                                 
-                        stac,c=StudentAc.objects.get(student=Student.objects.get(id=data['student']))
-                        stac.payment=payment
+                        stac=StudentAc.objects.get(student=Student.objects.get(id=data['student']))
+                        stac.payments=payment
                         stac.due_amount=due_amount
                         stac.credit_amount=credit_amount
                         stac.balance=balance
