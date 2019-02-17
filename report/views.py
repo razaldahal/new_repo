@@ -48,9 +48,9 @@ class ReportViewset(viewsets.ViewSet):
                         except:
                             return Response('student exists but it is not admitted')
                         bat = stdtadm.batch
-                        print(bat)
-                        print(r.get('batch'))
-                        if bat == int(r.get('batch')):
+                        _class = SectionStudent.objects.get(student_id=stdt.id).section._class.name
+                        if _class == str(r.get('class')):
+                        
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -128,8 +128,10 @@ class ReportViewset(viewsets.ViewSet):
                             return Response('Student exists but it is not admitted')
                         bat = stdntadm.batch
                         usr = stdnt.user
-
-                        if bat == int(r.get('batch')):
+                        _class = SectionStudent.objects.get(student_id=stdt.id).section._class.name
+                        print(bat)
+                        print(r.get('batch'))
+                        if _class == str(r.get('class')):
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -203,7 +205,10 @@ class ReportViewset(viewsets.ViewSet):
                         bat = stdtadm.batch
                         print(bat)
                         print(r.get('batch'))
-                        if bat == int(r.get('batch')):
+                        _class = SectionStudent.objects.get(student_id=stdt.id).section._class.name
+                        print(bat)
+                        print(r.get('batch'))
+                        if _class == str(r.get('class')):
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -286,7 +291,11 @@ class ReportViewset(viewsets.ViewSet):
                             bat = stdtadm.batch
                             print(bat)
                             print(r.get('batch'))
-                            if bat == int(r.get('batch')):
+                            _class = SectionStudent.objects.get(student_id=stdt.id).section._class.name
+                            print(bat)
+                            print(r.get('batch'))
+                            if _class == str(r.get('class')):
+                            
                                 print('True')
                                 lst = []
                                 c = ContentType.objects.get_for_model(usr)
