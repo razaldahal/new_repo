@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'dashboard',
     'event',
     'exam',
-    'report'
+    'report',
+    'setting'
 ]
 
 MIDDLEWARE = [

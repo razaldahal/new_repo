@@ -44,5 +44,6 @@ urlpatterns = [
     path('api/dashboard/',include('dashboard.urls')),
     path('api/event/',include('event.urls')),
     path('api/exam/',include('exam.urls')),
-    path('api/report/',include('report.urls'))
+    path('api/report/',include('report.urls')),
+    path('api/setting/',include('setting.urls'))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
