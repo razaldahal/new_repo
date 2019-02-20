@@ -21,6 +21,7 @@ class ReportViewset(viewsets.ViewSet):
         r = request.GET
         res = []
         lst = []
+        
         for k in userdql:
             print(k)
             if k in r and k != 'route':
@@ -32,8 +33,11 @@ class ReportViewset(viewsets.ViewSet):
                 userval = [users for users in userv]
                 if userval != []:
                     print(userval)
+                    id=0
                     for user in userval:
+                        id=id
                         print(user)
+
                         vls = list(user.values())
                         usr = User.objects.get(id=vls[0])
                         print(usr)
@@ -75,7 +79,12 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdt
                             stdtadm = stdtadm
+                            tmp['admission_no']=std.registration_no
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name
                             tmp['admission_date'] = stdtadm.admission_date
+                            tmp['id']=id+1
+                            id+=1 
                             try:
                                 gstd = GuardianStudent.objects.get(
                                     student_id=std.id)
@@ -101,7 +110,7 @@ class ReportViewset(viewsets.ViewSet):
                             lst.append(tmp)
                         elif not r.get('class'):
 
-                                                    
+                            id=id                        
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -126,7 +135,12 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdt
                             stdtadm = stdtadm
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name                            
+                            tmp['admission_no']=std.registration_no
                             tmp['admission_date'] = stdtadm.admission_date
+                            tmp['id']=id+1
+                            id+=1
                             try:
                                 gstd = GuardianStudent.objects.get(
                                     student_id=std.id)
@@ -160,7 +174,9 @@ class ReportViewset(viewsets.ViewSet):
                 stdval = [std for std in tstdv]
                 if stdval != []:
                     print(stdval)
+                    id=0
                     for stds in stdval:
+                        id=id
                         print(stds)
                         stdvals = list(stds.values())
                         stdnt = Student.objects.get(id=stdvals[0])
@@ -200,7 +216,11 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdnt
                             stdadm = stdntadm
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name                            
+                            tmp['admission_no']=std.registration_no
                             tmp['admission_date'] = stdadm.admission_date
+                            tmp['id']=id+1
                             try:
                                 gstd = GuardianStudent.objects.get(
                                     student_id=std.id)
@@ -218,7 +238,8 @@ class ReportViewset(viewsets.ViewSet):
 
                             lst.append(tmp)
 
-                        elif not r.get('class'):                        
+                        elif not r.get('class'):
+                            id=id                        
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -243,7 +264,11 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdt
                             stdtadm = stdtadm
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name                           
+                            tmp['admission_no']=std.registration_no
                             tmp['admission_date'] = stdtadm.admission_date
+                            tmp['id']=id+1
                             try:
                                 gstd = GuardianStudent.objects.get(
                                     student_id=std.id)
@@ -273,9 +298,10 @@ class ReportViewset(viewsets.ViewSet):
                 userval = [users for users in userv]
                 if userval != []:
                     print(userval)
+                    id=0
                     for user in userval:
                         print(user)
-                        
+                        id=id
                         usr = User.objects.get(id=user.id)
                         print(usr)
                         try: 
@@ -319,7 +345,12 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdt
                             stdtadm = stdtadm
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name                            
+                            tmp['admission_no']=std.registration_no
                             tmp['admission_date'] = stdtadm.admission_date
+                            tmp['id']=id+1
+                            id+=1
                             try:
                                 gstd = GuardianStudent.objects.get(
                                     student_id=std.id)
@@ -344,7 +375,7 @@ class ReportViewset(viewsets.ViewSet):
 
                             lst.append(tmp)
                         elif not r.get('class'):                        
-                                                    
+                            id=id                        
                             print('True')
                             lst = []
                             c = ContentType.objects.get_for_model(usr)
@@ -369,6 +400,11 @@ class ReportViewset(viewsets.ViewSet):
                             }
                             std = stdt
                             stdtadm = stdtadm
+                            tmp['batch']=stdtadm.batch
+                            tmp['course']=stdtadm.course.name                            
+                            tmp['admission_no']=std.registration_no
+                            tmp['id'] = id+1
+                            id+=1
                             tmp['admission_date'] = stdtadm.admission_date
                             try:
                                 gstd = GuardianStudent.objects.get(
@@ -401,8 +437,10 @@ class ReportViewset(viewsets.ViewSet):
                 for obj in addv:
                     user_ids = [obj.object_id]
                     if user_ids != []:
+                        id=o
                         for user in user_ids:
                             print(user)
+                            id=id
 
                             usr = User.objects.get(id=user)
                             print(usr)
@@ -449,7 +487,12 @@ class ReportViewset(viewsets.ViewSet):
                                     }
                                 std = stdt
                                 stdtadm = stdtadm
+                                tmp['batch']=stdtadm.batch
+                                tmp['course']=stdtadm.course.name                                
+                                tmp['admission_no']=std.registration_no
                                 tmp['admission_date'] = stdtadm.admission_date
+                                tmp['id']=id+1
+                                id+=1
                                 try:
                                     gstd = GuardianStudent.objects.get(
                                         student_id=std.id)
@@ -475,7 +518,7 @@ class ReportViewset(viewsets.ViewSet):
                                 lst.append(tmp)
                             elif not r.get('class'):                        
 
-                                                        
+                                id=id                        
                                 print('True')
                                 lst = []
                                 c = ContentType.objects.get_for_model(usr)
@@ -500,6 +543,11 @@ class ReportViewset(viewsets.ViewSet):
                                     }
                                 std = stdt
                                 stdtadm = stdtadm
+                                tmp['batch']=stdtadm.batch
+                                tmp['course']=stdtadm.course.name
+                                tmp['admission_no']=std.registration_no
+                                tmp['id']=id+1
+                                id+=1
                                 tmp['admission_date'] = stdtadm.admission_date
                                 try:
                                     gstd = GuardianStudent.objects.get(
