@@ -2,16 +2,16 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 # Create your views here.
 from .models import InstitutionDetail
-
+from .serializers import InstitutionDetailSerializer
 from rest_framework.response import Response
 from rest_framework import status,viewsets
-class InstitutuionDetailsViewset(viewsets.ViewSet):
+class InstitutuionDetailsViewset(viewsets.ModelViewSet):
     queryset=InstitutionDetail.objects.all()
-    def pre_save(self, obj):
-        obj.logo = self.request.FILES.get('file')
+    serializer_class=InstitutionDetailSerializer
+
     def create(self,request):
         
-        print(request.data)
+        print(self.request.FILES['logo'])
         setting=request.data
         if request.data=={}:
             return Response({"Error":"blank data"},status=status.HTTP_400_BAD_REQUEST)
@@ -25,7 +25,7 @@ class InstitutuionDetailsViewset(viewsets.ViewSet):
                 a.value=v
                 a.save()
             except:
-                InstitutionDetail.objects.update_or_create(key=k,value=v)
+                InstitutionDetail.objects.update_or_create(key=k,value=v,logo = self.request.FILES['logo'])
                                   
         return Response('Created',status=status.HTTP_201_CREATED)
 
