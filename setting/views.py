@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 # Create your views here.
+from rest_framework.parsers import MultiPartParser,FileUploadParser,FormParser
 from .models import InstitutionDetail
 from .serializers import InstitutionDetailSerializer
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from rest_framework import status,viewsets
 class InstitutuionDetailsViewset(viewsets.ModelViewSet):
     queryset=InstitutionDetail.objects.all()
     serializer_class=InstitutionDetailSerializer
+    parser_classes=(MultiPartParser,FileUploadParser,FormParser)
 
     def create(self,request):
         
@@ -25,7 +27,7 @@ class InstitutuionDetailsViewset(viewsets.ModelViewSet):
                 a.value=v
                 a.save()
             except:
-                InstitutionDetail.objects.update_or_create(key=k,value=v,logo = self.request.FILES['logo'])
+                InstitutionDetail.objects.update_or_create(key=k,value=v,logo = self.request.FILES.get('logo'))
                                   
         return Response('Created',status=status.HTTP_201_CREATED)
 
