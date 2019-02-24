@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 # Create your views here.
-from rest_framework.parsers import MultiPartParser,FileUploadParser,FormParser
+from rest_framework.parsers import MultiPartParser,JSONParser,FileUploadParser,FormParser
 from .models import InstitutionDetail
 from .serializers import InstitutionDetailSerializer
 from rest_framework.response import Response
@@ -9,11 +9,12 @@ from rest_framework import status,viewsets
 class InstitutuionDetailsViewset(viewsets.ModelViewSet):
     queryset=InstitutionDetail.objects.all()
     serializer_class=InstitutionDetailSerializer
-    parser_classes=(MultiPartParser,FileUploadParser,FormParser)
+    parser_classes=(MultiPartParser,FormParser,JSONParser,FileUploadParser)
 
     def create(self,request):
         
-        print(self.request.FILES['logo'])
+        print(request.POST)
+        print(request.data)
         setting=request.data
         if request.data=={}:
             return Response({"Error":"blank data"},status=status.HTTP_400_BAD_REQUEST)
@@ -36,10 +37,14 @@ class InstitutuionDetailsViewset(viewsets.ModelViewSet):
     def list(self,request):
         output={}
         lst=[]
-        for obj in InstitutionDetail.objects.all():
+        qst=InstitutionDetail.objects.all().exclude(key='csrfmiddlewaretoken')
+        for obj in qst:
+
             output['id']=obj.id
             output[obj.key]=obj.value
+            
         lst.append(output)
+        
         return Response(output)    
 
                  
