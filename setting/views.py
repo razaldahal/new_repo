@@ -39,9 +39,11 @@ class InstitutuionDetailsViewset(viewsets.ModelViewSet):
         lst=[]
         qst=InstitutionDetail.objects.all().exclude(key='csrfmiddlewaretoken')
         for obj in qst:
-
-            output['id']=obj.id
-            output[obj.key]=obj.value
+            if not obj.logo:
+                output['id']=obj.id
+                output[obj.key]=obj.value
+            else:
+                 output['logo']=obj.logo.url  
             
         lst.append(output)
         
