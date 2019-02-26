@@ -186,7 +186,11 @@ class StudentViewSet(ModelViewSet):
         if serializer.is_valid():
             data = serializer.data
             
-            UserPostSerializer().update(instance.user, data['user'])
+            # UserPostSerializer().update(instance.user, data['user'])
+            s = UserPostSerializer(instance.user, data['user'])
+            if s.is_valid():
+                s.save()
+                
             address = Address.objects.get(id=data['address']['id'])
             AddressSerializer().update(address, data['address'])
             father = Guardian.objects.get(id=data['father']['id'])

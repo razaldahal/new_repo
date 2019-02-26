@@ -1,5 +1,5 @@
 from django.db import models
-from main.models import BaseModel
+from main.models import BaseModel, User
 
 ## This tables handles all data for each academic year
 class AcademicYear(BaseModel):
@@ -57,16 +57,16 @@ class Section(BaseModel):
 
 
 
-# class Teacher(BaseModel):
-#     user = models.ForeignKey(User,on_delete=models.CASCADE)
-#     qualification = models.TextField()
+class Faculty(BaseModel):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    qualification = models.TextField()
     
-#     class Meta:
-#         db_table = 'academic_teacher'
-#         verbose_name_plural = "Teacher"
+    class Meta:
+        db_table = 'academic_faculty'
+        verbose_name_plural = "Faculty"
 
-#     def __str__(self):
-#         return self.user.first_name+" "+self.user.last_name
+    def __str__(self):
+        return self.user.first_name+" "+self.user.last_name
 
 
 

@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from main.serializers import UserPostSerializer
 from .models import *
+
 
   
 class AcademicYearSerializer(serializers.ModelSerializer):
@@ -42,4 +45,13 @@ class SectionPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
         fields = ('name', )
+
+
+
+class FacultySerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    user = UserPostSerializer()
+    class Meta:
+        model = Faculty
+        fields = '__all__'
    

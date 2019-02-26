@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'dashboard',
     'library',
     'transport',
+    'event',
+    'faculty',
 
     #'admission',
     #'course',

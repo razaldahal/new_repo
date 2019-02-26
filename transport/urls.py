@@ -1,19 +1,13 @@
 from django.urls import path,include
-from django.conf.urls import url
-from django.conf.urls import url
+
 from rest_framework import routers
-from rest_framework_nested import routers
 
+from transport import views
 
-from .views import *
-
-router = routers.SimpleRouter()
-
-#router.register(r'category', CategoryViewSet)
-
+router = routers.DefaultRouter()
+router.register('vehicle',views.VehicleViewSet)
+router.register('staff',views.StaffViewSet)
+router.register('allocate',views.VehicleAllocationViewSet)
 urlpatterns = [
-
-	# url(r'search', BookSearchViewSet.as_view(), name='book-search'),
-	# url(r'^', include(router.urls)),
-
-]
+	path('',include(router.urls))
+	]
