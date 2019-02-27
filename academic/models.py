@@ -31,7 +31,7 @@ class Course(BaseModel):
 
 class Class(BaseModel):
     course = models.ForeignKey(Course,on_delete=models.CASCADE)
-    name = models.CharField(max_length=11)
+    name = models.CharField(max_length=120)
     description = models.TextField()
 
     class Meta:

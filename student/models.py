@@ -6,7 +6,7 @@ from academic.models import AcademicYear, Class, Section
 
 class Student(BaseModel):
     user = models.OneToOneField(User,on_delete=models.CASCADE, unique=True)
-    registration_no = models.CharField(max_length=20, unique=True)
+    registration_no = models.CharField(max_length=255, unique=True)
 
     class Meta:
         db_table = 'student_student'
@@ -17,11 +17,11 @@ class Student(BaseModel):
 
 class Guardian(BaseModel):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='guardian')
-    type=models.CharField(max_length=10)
-    name=models.CharField(max_length=100)
-    mobile=models.CharField(max_length=20, null=True, blank=True)
-    job=models.CharField(max_length=30, null=True, blank=True)
-    citizenship_no=models.CharField(max_length=10, null=True, blank=True)
+    type=models.CharField(max_length=255)
+    name=models.CharField(max_length=255)
+    mobile=models.CharField(max_length=12, null=True, blank=True)
+    job=models.CharField(max_length=255, null=True, blank=True)
+    citizenship_no=models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'student_parent'

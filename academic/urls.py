@@ -18,9 +18,14 @@ course_router.register(r'class', CourseClassViewSet, base_name='course-class')
 class_router = routers.NestedSimpleRouter(router, r'class', lookup='class')
 class_router.register(r'section', ClassSectionViewSet, base_name='class-section')
 
+examTerm_router = routers.NestedSimpleRouter(router, r'class', lookup='class')
+examTerm_router.register(r'term', ClassExamTermViewSet, base_name='class-term')
+
+
 
 urlpatterns = [
 	path('',include(class_router.urls)),
 	path('',include(course_router.urls)),
+	path('',include(examTerm_router.urls)),
 	url(r'^', include(router.urls)),
 ]

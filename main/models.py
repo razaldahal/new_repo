@@ -56,7 +56,7 @@ class User(BaseModel, AbstractUser):
     blood_group = models.IntegerField(null=True, blank=True)
     nationality = models.IntegerField(choices=NATIONALITY,null=True, blank=True)
     religion = models.IntegerField(choices=RELIGION,null=True, blank=True)
-    citizenship_no = models.CharField(max_length=10,null=True, blank=True)
+    citizenship_no = models.CharField(max_length=255,null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     current_address = models.TextField()
     phone = models.CharField(max_length=12, null=True, blank=True)

@@ -35,8 +35,10 @@ urlpatterns = [
     path('api/library/',include('library.urls')),
     path('api/transport/',include('transport.urls')),
     path('api/event/',include('event.urls')),
-    
-    # path('api/accountant/',include('accountant.urls')),
+    path('api/exam/',include('exam.urls')),
+
+    path('api/accounting/',include('accounting.urls')),
+    path('api/store/',include('store.urls')),
     # path('api/admission/',include('admission.urls')),
     # # path('api/class/',include('Class.urls')),
     # # path('api/section/',include('Section.urls')),

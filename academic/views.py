@@ -1,8 +1,10 @@
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import viewsets
 
 from .serializers import *
-
+from exam.models import ExamTerm
 
 class AcademicYearViewSet(ModelViewSet):
     queryset = AcademicYear.objects.all()
@@ -149,4 +151,19 @@ class ClassSectionViewSet(ModelViewSet):
 
 
 
-
+class ClassExamTermViewSet(viewsets.ViewSet):
+    queryset = ExamTerm.objects.all()
+  
+    def list(self, request, class_pk, pk=None):
+        queryset = self.queryset.filter(_class=class_pk).all()
+        output = []
+        for term in queryset:
+            dct = {
+               "id":term.id,
+               "name":term.name,
+               "start_date":term.start_date,
+               "end_date":term.end_date,
+  
+               }
+            output.append(dct)
+        return Response(output,status=status.HTTP_200_OK)

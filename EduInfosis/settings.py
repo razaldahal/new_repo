@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'transport',
     'event',
     'faculty',
+    'exam',
+    'accounting',
+    'store'
 
     #'admission',
     #'course',
@@ -108,10 +111,21 @@ WSGI_APPLICATION = 'EduInfosis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'eduinfosis_merged',
+        'USER': 'postgres',
+        'PASSWORD': 'dinesh',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 

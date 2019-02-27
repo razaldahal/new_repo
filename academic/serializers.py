@@ -5,6 +5,7 @@ from main.serializers import UserPostSerializer
 from .models import *
 
 
+
   
 class AcademicYearSerializer(serializers.ModelSerializer):
     #name = serializers.CharField(validators=[UniqueValidator(queryset=AcademicYear.objects.all())])
