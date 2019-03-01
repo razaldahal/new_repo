@@ -239,6 +239,24 @@ class ExamScheduleViewset(viewsets.ViewSet):
             "Detail":[serializer.errors]
         })
 
+class MarksEntryGetViewSet(viewsets.ViewSet):
+    queryset = Student.objects.all()
+
+    def list(self,request):
+        objects = self.queryset
+        output = []
+        for obj in objects:
+            temp={
+                'id':obj.id,
+                'name':obj.user.first_name + ' '+ obj.user.last_name,
+                'theory':0,
+                'practical':0,
+                'total':0,
+                'result':'fail'
+            }
+            output.append(temp)
+        return Response(output,status=status.HTTP_200_OK)
+        
 
 class MarksEntryViewSet(viewsets.ViewSet):
     queryset = MarksEntry.objects.all()
@@ -267,7 +285,7 @@ class MarksEntryViewSet(viewsets.ViewSet):
                 obj,created = MarksEntryDetail.objects.get_or_create(student_id=dct['id'],
                                                                     marks_entry_id=me.id,
                                                                 defaults={
-                                                                    'discipline':dct['discipline'],
+                                                                    'discipline':data['discipline'],
                                                                     'theory':dct['theory'],
                                                                     'practical':dct['practical'],
                                                                     'full_marks':marks_type['full_marks'],

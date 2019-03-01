@@ -63,4 +63,5 @@ class MarksEntrySerializer(serializers.Serializer):
     subject = serializers.IntegerField()
     marks_type = MarksTypeSerializer()
     student_data = serializers.ListField()
+    discipline = serializers.IntegerField(default=0)
 
