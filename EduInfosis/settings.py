@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'faculty',
     'exam',
     'accounting',
-    'store'
+    'store',
+    'setting'
 
     #'admission',
     #'course',
