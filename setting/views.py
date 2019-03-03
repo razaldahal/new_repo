@@ -27,15 +27,9 @@ class InstitutuionDetailsViewset(viewsets.ModelViewSet):
 
 
     def list(self,request):
-        output={}
-        lst=[]
-        qst=InstitutionDetail.objects.all().exclude(key='csrfmiddlewaretoken')
-        for obj in qst:
-            output['id']=obj.id
-            output[obj.key]=obj.value
-            
-        lst.append(output)
-        
+
+        output = getInstituteDetail()
+
         return Response(output)    
 
 class CollegeLogo(APIView):
@@ -44,9 +38,8 @@ class CollegeLogo(APIView):
     #     print("hello ET")
 
     def get(self,request):
-        obj = Media.objects.all().first()
-        data = MediaGetSerializer(obj).data
-        return Response({'logo':data['logo']})
+        output = getInstituteLogo()
+        return Response(output)
 
     def post(self, request, *args, **kwargs):
         print(request.POST)

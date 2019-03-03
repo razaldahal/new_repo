@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from academic.models import AcademicYear, Course, Class, Faculty
-from student.models import Student
+from student.serializers import Student, getBirthdays
+from setting.serializers import getInstituteDetail, getInstituteLogo
 
 def get_current_year():
     academic_year = AcademicYear.objects.filter(is_active=True).first()
@@ -28,8 +29,12 @@ class StatsViewSet(APIView):
                 'class':_class
                 },
             'academic':{},
-            'accounting': {'today_collection': 0}
+            'accounting': {'today_collection': 0},
+            'institute': getInstituteDetail(),
+            'birthdays': getBirthdays()
         }
+
+        output['institute'].update(getInstituteLogo())
 
         academic_year = get_current_year()
         if academic_year:

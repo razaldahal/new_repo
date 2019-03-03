@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -5,6 +7,24 @@ from main.models import User, Address
 from main.serializers import UserPostSerializer, AddressSerializer
 from .models import *
 
+
+def getBirthdays():
+    output = []
+    today = datetime.now().date()
+    print(today.month, today.day)
+    sts = StudentEnroll.objects.filter(
+        student__user__date_of_birth__month=today.month,
+        student__user__date_of_birth__day=today.day,
+
+        )
+    for s in sts:
+        output.append({
+                'id':s.student.id,
+                'first_name': s.student.user.first_name,
+                'last_name': s.student.user.last_name,
+                'course': s._class.course.name,
+            })
+    return output
 
 class StudentPostSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField()
