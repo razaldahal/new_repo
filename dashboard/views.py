@@ -3,7 +3,7 @@ from rest_framework import viewsets,status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from academic.models import AcademicYear, Course, Class
+from academic.models import AcademicYear, Course, Class, Faculty
 from student.models import Student
 
 def get_current_year():
@@ -15,7 +15,7 @@ def get_current_year():
 class StatsViewSet(APIView):
     
     def get(self,request):    
-        employee = 0 #Teacher.objects.count()
+        employee = Faculty.objects.count()
         student = Student.objects.count()
         course = Course.objects.count()
         _class = Class.objects.count()
@@ -27,7 +27,8 @@ class StatsViewSet(APIView):
                 'course':course,
                 'class':_class
                 },
-            'academic':{}
+            'academic':{},
+            'accounting': {'today_collection': 0}
         }
 
         academic_year = get_current_year()
