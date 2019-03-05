@@ -8,6 +8,44 @@ from operator import itemgetter
 from .serializers import *
 from .models import *
 
+class MethodSerializerView(object):
+    method_serializer_classes = None
+
+    def get_serializer_class(self):
+        assert self.method_serializer_classes is not None, (
+            'Expected view %s should contain method_serializer_classes '
+            'to get right serializer class.' %
+            (self.__class__.__name__, )
+        )
+        for methods, serializer_cls in self.method_serializer_classes.items():
+            if self.request.method in methods:
+                return serializer_cls
+
+        raise exceptions.MethodNotAllowed(self.request.method)
+
+class FacultyViewSet(MethodSerializerView,viewsets.ModelViewSet):
+    queryset = FacultySalary.objects.all()
+
+    method_serializer_classes = {
+        ('POST'): FacultySerializer,
+        ('PUT'):FacultySalaryUpdateSerializer,
+        ('GET'): FacultySalaryGetSerializer,
+        }
+
+    def update(self, request, pk):
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.data
+            instance.salary = data['salary']
+            instance.save()
+            return Response(data)
+
+        else:
+            raise serializers.ValidationError({'Detail':[serializer.errors]})
+
+
+
 class ExpenseCategoryViewSet(viewsets.ModelViewSet):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer

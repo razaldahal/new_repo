@@ -2,6 +2,12 @@ from django.db import models
 from main.models import BaseModel
 from academic.models import Class
 from student.models import Student
+from academic.models import Faculty
+
+class FacultySalary(BaseModel):
+    faculty = models.ForeignKey(Faculty,on_delete=models.CASCADE)
+    salary = models.IntegerField()
+    remarks = models.CharField(max_length=120)
 
 class ExpenseCategory(BaseModel):
     name = models.CharField(max_length=120)
@@ -79,3 +85,4 @@ class StudentPayment(BaseModel):
 # 02/13/2019 ,05:18:25	library	            400	        -	    500	            -500
 # 02/12/2019 ,05:18:25	tutitoin	        -       	900	    100	           -100
 # 02/11/2019 ,05:18:25	tutitoin	        1000	    -	    0	            -1000
+

@@ -1,6 +1,36 @@
 from rest_framework import serializers
 from .models import *
+from rest_framework.validators import UniqueTogetherValidator
+from academic.serializers import FacultySerializer
 
+class FacultySalaryGetSerializer(serializers.ModelSerializer):
+    faculty = FacultySerializer()
+    class Meta:
+        model = FacultySalary
+        fields = ('__all__')
+
+class FacultySerializer(serializers.ModelSerializer):
+    faculty_id = serializers.IntegerField()
+    
+    class Meta:
+        model = FacultySalary
+        fields = (
+            'id','faculty_id','salary','remarks',
+            )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=FacultySalary.objects.all(),
+                fields=('faculty_id',)
+            )
+        ]
+class FacultySalaryUpdateSerializer(serializers.ModelSerializer):
+    faculty_id = serializers.IntegerField()
+    class Meta:
+        model = FacultySalary
+        fields = ('faculty_id','salary')
+    
+
+    
 class ExpenseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseCategory
