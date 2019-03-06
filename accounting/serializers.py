@@ -53,6 +53,18 @@ class FeeAllocationSerializer(serializers.Serializer):
     fee_category = serializers.IntegerField()
     total_amount = serializers.IntegerField()
 
+
+
+class FeeAllocationGetSerializer(serializers.ModelSerializer):
+    course = serializers.CharField(source='_class.course.name')
+    _class = serializers.CharField(source='_class.name')
+    fee_category = serializers.CharField(source='fee_category.name')
+    total_amount = serializers.FloatField()
+
+    class Meta:
+        model = FeeAllocation
+        fields = ('id', 'course', '_class', 'fee_category', 'total_amount', )
+
 class FeeAllocationUpdateSerializer(serializers.Serializer):
     total_amount = serializers.IntegerField()
 
@@ -68,5 +80,5 @@ class StudentPaymentSerializer(serializers.Serializer):
     fee_allocation_id = serializers.IntegerField()
     amount = serializers.IntegerField()
     student_id = serializers.IntegerField()
-    remarks = serializers.CharField()
+    remarks = serializers.CharField(required=False)
 

@@ -1,4 +1,5 @@
 from rest_framework import viewsets,serializers,status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from num2words import num2words
 from datetime import datetime
@@ -50,8 +51,9 @@ class ExpenseCategoryViewSet(viewsets.ModelViewSet):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer
 
-class DailyExpenseViewSet(viewsets.ViewSet):
+class DailyExpenseViewSet(viewsets.ModelViewSet):
     queryset = DailyExpense.objects.all()
+    serializer_class = DailyExpenseSerializer
 
     def create(self,request):
         serializer = DailyExpenseSerializer(data=request.data)
@@ -154,8 +156,19 @@ class FeeCategoryViewSet(viewsets.ModelViewSet):
     queryset = FeeCategory.objects.all()
     serializer_class = FeeCategorySerializer
 
-class FeeAllocationViewSet(viewsets.ViewSet):
+
+# class FeeAllocationViewSet(viewsets.ModelViewSet):
+#     queryset = FeeAllocation.objects.all()
+
+class FeeAllocationViewSet(viewsets.ModelViewSet):
     queryset = FeeAllocation.objects.all()
+    serializer_class = FeeAllocationSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        if self.request.method == 'GET':
+            serializer_class = FeeAllocationGetSerializer
+        return serializer_class(*args, **kwargs)
 
     def create(self,request):
         serializer = FeeAllocationSerializer(data=request.data)
@@ -168,61 +181,28 @@ class FeeAllocationViewSet(viewsets.ViewSet):
                 
                 for c_obj in class_obj:
                     class_id = c_obj.id
-                    c_filter = FeeAllocation.objects.filter(_class_id=class_id,fee_category_id=data['fee_category'])
-                    if not c_filter:
-                        obj,created = FeeAllocation.objects.get_or_create(fee_category_id=data['fee_category'],
-                                                                _class_id =class_id,
-                                                                defaults = {
-                                                                    'total_amount':data['total_amount']
-                                                                })
-                   
-                        # if not created:
-                        #     return Response("Class Already Existttrfy",status=status.HTTP_400_BAD_REQUEST)
-                        # if created:
-                        #     return Response(data,status=status.HTTP_201_CREATED)
-                        
-                    if c_filter:
-                        print(class_id)
+                    obj,created = FeeAllocation.objects.update_or_create(
+                        fee_category_id=data['fee_category'],
+                        _class_id =class_id,
+                        defaults = {'total_amount':data['total_amount']})
+
                 return Response(data,status=status.HTTP_201_CREATED)
 
             if fee_for==2:
-                obj,created = FeeAllocation.objects.get_or_create(fee_category_id=data['fee_category'],
-                                                            _class_id = data['_class'],
-                                                            defaults = {
-                                                                'total_amount':data['total_amount']
-                                                            })
-                if not created:
-                    return Response("Fee Category & Class Should be Unique",status=status.HTTP_400_BAD_REQUEST)
+                obj,created = FeeAllocation.objects.update_or_create(
+                    fee_category_id=data['fee_category'],
+                    _class_id = data['_class'],
+                    defaults = {'total_amount':data['total_amount']})
 
                 if created:
                     return Response(data,status=status.HTTP_201_CREATED)
-            
-
            
         else:
             raise serializers.ValidationError({
                 'Detail':[serializer.errors]
             })
 
-    def get_object(self,pk):
-        try:
-            return FeeAllocation.objects.get(id=pk)
-        except:
-            raise serializers.ValidationError({
-                'DataBase Error':['Data Not Exist With This Id']
-            })
 
-    def retrieve(self,request,pk):
-        obj = self.get_object(pk)
-        temp ={
-            'id':obj.id,
-            'course':obj._class.course.name,
-            'class':obj._class.name,
-            'fee_category':obj.fee_category.name,
-            'total_amount':obj.total_amount,
-         
-            }
-        return Response(temp,status=status.HTTP_200_OK)
 
     def update(self,request,pk):
         obj = self.get_object(pk)
@@ -241,23 +221,6 @@ class FeeAllocationViewSet(viewsets.ViewSet):
 
 
 
-
-    def list(self,request):
-        queryset = self.queryset
-        output = []
-        for q in queryset:
-            temp ={
-                'id':q.id,
-                'course':q._class.course.name,
-                'class':q._class.name,
-                'fee_category':q.fee_category.name,
-                'total_amount':q.total_amount,
-                'paid_amount':0
-            }
-            output.append(temp)
-
-
-        return Response(output,status=status.HTTP_200_OK)
 
 class FeeCollectionViewSet(viewsets.ViewSet):
     queryset = StudentPayment.objects.all()
@@ -279,7 +242,7 @@ class FeeCollectionViewSet(viewsets.ViewSet):
                 obj = StudentPayment.objects.create(
                             fee_allocation_id = data['fee_allocation_id'],
                             student_id = data['student_id'],
-                            remarks = data['remarks'],
+                            remarks = data.get('remarks', False),
                             amount = data['amount'],
                             payment_status = 2,
                             payment_type = 2
@@ -289,7 +252,7 @@ class FeeCollectionViewSet(viewsets.ViewSet):
                 obj = StudentPayment.objects.create(
                             fee_allocation_id = data['fee_allocation_id'],
                             student_id = data['student_id'],
-                            remarks = data['remarks'],
+                            remarks = data.get('remarks',False),
                             amount = data['amount'],
                             payment_status = 1,
                             payment_type = 2
@@ -299,7 +262,7 @@ class FeeCollectionViewSet(viewsets.ViewSet):
                 obj = StudentPayment.objects.create(
                             fee_allocation_id = data['fee_allocation_id'],
                             student_id = data['student_id'],
-                            remarks = data['remarks'],
+                            remarks = data.get('remarks',False),
                             amount = data['amount'],
                             payment_status = 3,
                             payment_type = 2
