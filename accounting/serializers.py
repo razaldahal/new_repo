@@ -9,9 +9,8 @@ class FacultySalaryGetSerializer(serializers.ModelSerializer):
         model = FacultySalary
         fields = ('__all__')
 
-class FacultySerializer(serializers.ModelSerializer):
+class FacultyPostSerializer(serializers.ModelSerializer):
     faculty_id = serializers.IntegerField()
-    
     class Meta:
         model = FacultySalary
         fields = (
@@ -29,8 +28,20 @@ class FacultySalaryUpdateSerializer(serializers.ModelSerializer):
         model = FacultySalary
         fields = ('faculty_id','salary')
     
+class FacultySalaryPaymentGetSerializer(serializers.ModelSerializer):
+    faculty = FacultySerializer()
+    class Meta:
+        model = FacultySalaryPayment
+        fields = ('__all__')
 
-    
+class FacultySalaryPaymentSerializer(serializers.ModelSerializer):
+    faculty_id = serializers.IntegerField()
+    class Meta:
+        model = FacultySalaryPayment
+        fields = ('faculty_id','month','amount','remarks')
+
+
+
 class ExpenseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseCategory

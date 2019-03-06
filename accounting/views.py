@@ -28,7 +28,7 @@ class FacultyViewSet(MethodSerializerView,viewsets.ModelViewSet):
     queryset = FacultySalary.objects.all()
 
     method_serializer_classes = {
-        ('POST'): FacultySerializer,
+        ('POST'): FacultyPostSerializer,
         ('PUT'):FacultySalaryUpdateSerializer,
         ('GET'): FacultySalaryGetSerializer,
         }
@@ -46,6 +46,40 @@ class FacultyViewSet(MethodSerializerView,viewsets.ModelViewSet):
             raise serializers.ValidationError({'Detail':[serializer.errors]})
 
 
+class FacultySalaryPaymentViewSet(MethodSerializerView,viewsets.ModelViewSet):
+    queryset = FacultySalaryPayment.objects.all()
+    # serializer_class = FacultySalaryPaymentSerializer
+
+    method_serializer_classes = {
+        ('POST'): FacultySalaryPaymentSerializer,
+        # ('PUT'):FacultySalaryUpdateSerializer,
+        # ('GET'): FacultySalaryPaymentGetSerializer,
+        }
+    def list(self,request):
+        data = request.GET
+        faculty_id = data['faculty_id']
+        try:
+            # obj = FacultySalaryPayment.objects.get(faculty__faculty_id=faculty_id)
+            objects = self.queryset.filter(faculty_id=faculty_id)
+            output = []
+            total_paid = 0
+            output_dict = {}
+            output_dict['faculty_name'] = objects[0].faculty.user.first_name
+            for obj in objects:
+                temp = {
+                    # 'faculty_name':obj.faculty.user.first_name ,
+                    'amount':obj.amount,
+                    'month':obj.month,
+                    'date_paid':obj.date_created
+                }
+                total_paid += obj.amount
+                output.append(temp)
+            output_dict['paid_detail'] = output
+            output_dict['total_paid'] = total_paid
+            return Response(output_dict)
+        except:
+            return Response([])
+        
 
 class ExpenseCategoryViewSet(viewsets.ModelViewSet):
     queryset = ExpenseCategory.objects.all()
