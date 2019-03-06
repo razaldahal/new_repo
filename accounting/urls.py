@@ -13,7 +13,7 @@ router.register(r'student_payment',views.FeeCollectionViewSet)
 # router.register(r'fee_allocation',views.FeeCollectionViewSet)
 router.register(r'payment_history',views.PaymentHistoryViewSet)
 router.register(r'assign-salary',views.FacultyViewSet)
-# router.register(r'voucher',views.VoucherViewSet)
+router.register(r'payment-salary',views.FacultySalaryPaymentViewSet)
 
 
 urlpatterns = [

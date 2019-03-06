@@ -9,6 +9,12 @@ class FacultySalary(BaseModel):
     salary = models.IntegerField()
     remarks = models.CharField(max_length=120)
 
+class FacultySalaryPayment(BaseModel):
+    faculty = models.ForeignKey(Faculty,on_delete=models.CASCADE)
+    month = models.CharField(max_length=120)
+    amount = models.IntegerField()
+    remarks = models.CharField(max_length=120)
+
 class ExpenseCategory(BaseModel):
     name = models.CharField(max_length=120)
     description = models.CharField(max_length=120)
