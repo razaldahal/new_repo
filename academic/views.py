@@ -21,7 +21,7 @@ class AcademicYearViewSet(ModelViewSet):
             data=serializer.data
 
             ## first make all false
-            for obj in self.queryset:
+            for obj in self.get_queryset():
                 obj.is_active = False
                 obj.save()
 

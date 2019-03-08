@@ -47,7 +47,8 @@ PAYMENT_STATUS = (
     (1,'Fully PAID'),
     (2,'PARTIALLY PAID'),
     (3,'PAID IN ADVANCE'),
-    (4,'DUE')
+    (4,'DUE'),
+    (5, 'Others')
 )
 
 PAYMENT_TYPE = (

@@ -7,9 +7,9 @@ from .helpers.tuple import get_choice_string
 
 
 class BaseModel(models.Model):
-    date_created = models.DateField(auto_now_add=True)
-    date_updated = models.DateField(auto_now=True)
-    date_deleted = models.DateField(null=True,blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    date_deleted = models.DateTimeField(null=True,blank=True)
 
 
     class Meta:

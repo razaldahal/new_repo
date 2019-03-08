@@ -47,6 +47,13 @@ class ExpenseCategorySerializer(serializers.ModelSerializer):
         model = ExpenseCategory
         fields = ('id','name','description')
 
+
+class ExpenseGetSerializer(serializers.ModelSerializer):
+    expense_type = serializers.CharField(source='expense_type.name')
+    class Meta:
+        model = DailyExpense
+        fields = ('id', 'expense_type', 'receipt_number', 'expense_detail', 'amount', 'expense_date',)
+
 class DailyExpenseSerializer(serializers.ModelSerializer):
     expense_type = serializers.IntegerField()
     class Meta:
@@ -92,4 +99,5 @@ class StudentPaymentSerializer(serializers.Serializer):
     amount = serializers.IntegerField()
     student_id = serializers.IntegerField()
     remarks = serializers.CharField(required=False)
+    payment_type = serializers.IntegerField()
 
