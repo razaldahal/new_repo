@@ -39,7 +39,8 @@ urlpatterns = [
 
     path('api/accounting/',include('accounting.urls')),
     path('api/store/',include('store.urls')),
-     path('api/setting/',include('setting.urls')),
+   path('api/setting/',include('setting.urls')),
+   path('api/report/',include('report.urls')),
     # path('api/admission/',include('admission.urls')),
     # # path('api/class/',include('Class.urls')),
     # # path('api/section/',include('Section.urls')),
