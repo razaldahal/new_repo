@@ -37,10 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     #3rd party
     'corsheaders',
     'rest_framework',
-
+    'django_filters',
     'drf_yasg',
 
     'main',
@@ -55,7 +56,8 @@ INSTALLED_APPS = [
     'exam',
     'accounting',
     'store',
-    'setting'
+    'setting',
+    'report'
 
     #'admission',
     #'course',
