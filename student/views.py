@@ -160,7 +160,7 @@ class StudentViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         students = []
-        objects = self.queryset
+        objects = self.get_queryset()
         section_id = request.GET.get('section_id', False)
         if section_id:
             objects = []

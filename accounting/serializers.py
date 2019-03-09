@@ -1,7 +1,42 @@
+from django.db.models import Sum
+
 from rest_framework import serializers
-from .models import *
 from rest_framework.validators import UniqueTogetherValidator
 from academic.serializers import FacultySerializer
+from .models import *
+
+from datetime import datetime, timedelta, time
+
+
+def getTodayCollection():
+    today = datetime.now().date()
+    tomorrow = today + timedelta(1)
+    today_start = datetime.combine(today, time())
+    today_end = datetime.combine(tomorrow, time())
+
+    rows = StudentPayment.objects.filter(date_created__lt=today_end, date_created__gt=today_start)
+    total = 0
+    for row in rows:
+        if row.payment_type == 2:
+            total += row.amount
+    return total
+
+def getTotalDue():
+    # total_amount = StudentPayment.objects.aggregate(Sum('amount'))['amount__sum']
+    # total_paid = StudentPayment.objects.filter(payment_type=1).aggregate(Sum('amount'))['amount__sum']
+    # print(total_amount, total_paid)
+    # return total_amount - total_paid
+    payments = StudentPayment.objects.filter()
+    current_due = 0
+    for p in payments:
+        if p.payment_type == 1:
+            current_due += p.amount
+            
+        else:
+            current_due -= p.amount
+    return current_due
+
+
 
 class FacultySalaryGetSerializer(serializers.ModelSerializer):
     faculty = FacultySerializer()

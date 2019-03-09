@@ -60,7 +60,7 @@ class FacultySalaryPaymentViewSet(MethodSerializerView,viewsets.ModelViewSet):
         faculty_id = data['faculty_id']
         try:
             # obj = FacultySalaryPayment.objects.get(faculty__faculty_id=faculty_id)
-            objects = self.queryset.filter(faculty_id=faculty_id)
+            objects = self.get_queryset().filter(faculty_id=faculty_id)
             output = []
             total_paid = 0
             output_dict = {}
@@ -232,49 +232,31 @@ class FeeCollectionViewSet(viewsets.ViewSet):
     queryset = StudentPayment.objects.all()
 
     def create(self,request):
-        serializer = StudentPaymentSerializer(data=request.data)
+        serializer = StudentPaymentSerializer(data=request.data, many=True)
         if serializer.is_valid():
-            data = serializer.data
-            paid_amount = int(data['amount'])
-            try:
-                obj = FeeAllocation.objects.get(id=data['fee_allocation_id'])
-                total_amount = obj.total_amount
+            rows = serializer.data
+            for data in rows:
+                paid_amount = int(data['amount'])
+                try:
+                    obj = FeeAllocation.objects.get(id=data['fee_allocation_id'])
+                    total_amount = obj.total_amount
+                    
+                except:
+                    raise serializers.ValidationError({
+                        'Detail':['FeeAllocation With This Id Not Exist']
+                    })
+                obj = StudentPayment.objects.create(
+                                fee_allocation_id = data['fee_allocation_id'],
+                                student_id = data['student_id'],
+                                remarks = data.get('remarks', ''),
+                                amount = data['amount'],
+                                payment_status = 2,
+                                payment_type = int(data['payment_type'])
+                                )
+
                 
-            except:
-                raise serializers.ValidationError({
-                    'Detail':['FeeAllocation With This Id Not Exist']
-                })
-            if total_amount > paid_amount:
-                obj = StudentPayment.objects.create(
-                            fee_allocation_id = data['fee_allocation_id'],
-                            student_id = data['student_id'],
-                            remarks = data.get('remarks', False),
-                            amount = data['amount'],
-                            payment_status = 2,
-                            payment_type = int(data['payment_type'])
-                            )
-
-            elif total_amount == paid_amount:
-                obj = StudentPayment.objects.create(
-                            fee_allocation_id = data['fee_allocation_id'],
-                            student_id = data['student_id'],
-                            remarks = data.get('remarks',False),
-                            amount = data['amount'],
-                            payment_status = 1,
-                            payment_type = int(data['payment_type'])
-                            )
-
-            else:
-                obj = StudentPayment.objects.create(
-                            fee_allocation_id = data['fee_allocation_id'],
-                            student_id = data['student_id'],
-                            remarks = data.get('remarks',False),
-                            amount = data['amount'],
-                            payment_status = 3,
-                            payment_type = int(data['payment_type'])
-                        )
-            
-            return Response(data ,status=status.HTTP_201_CREATED)
+                
+            return Response(rows ,status=status.HTTP_201_CREATED)
         else:
             raise serializers.ValidationError({
                 'Detail':[serializer.errors]
@@ -284,81 +266,6 @@ class FeeCollectionViewSet(viewsets.ViewSet):
 class PaymentHistoryViewSet(viewsets.ModelViewSet):
     queryset = StudentPayment.objects.all()
     serializer_class = StudentPaymentSerializer
-    fclst = []
-    remaining_dues = 0
-    total_balance = 0
-    output = []
-    def PaymentStateMentDetail(self,temp):
-
-        # newlist = sorted(dataList, key=itemgetter('paid_date'),reverse=False)
-        # print(temp['paid_amount'])
-        pa = temp['paid_amount']
-        da = temp['dues']
-
-        if temp['payment_type'] ==1:
-            pass
-
-       
-        if temp['fee_category_id'] not in self.fclst:
-            self.fclst.append(temp['fee_category_id'])
-        else:
-            pass
-            # if pa < da:
-            #     if pa == 0:
-            #         # self.remaining_dues += da
-            #         if self.total_balance > self.remaining_dues:
-            #             self.remaining_dues += 0
-            #             self.total_balance = self.total_balance - da 
-            #     else:
-            #         if self.total_balance > 0:
-            #             if da > self.total_balance:
-            #                 self.remaining_dues =da - self.total_balance
-            #                 self.total_balance = 0
-            #             else:
-            #                 self.remaining_dues = self.total_balance - da
-            #                 self.total_balance -= da
-            #         else:
-            #             self.remaining_dues += da - pa
-            # else:
-        #         if self.remaining_dues > pa:
-        #             self.remaining_dues += da
-        #             self.remaining_dues -= pa
-        #         elif pa == 0:
-        #             if self.total_balance > self.remaining_dues:
-        #                 self.remaining_dues += 0
-        #                 self.total_balance = self.total_balance - da 
-        #         else:
-        #             self.total_balance += pa - da
-
-        #     # elif temp['']
-
-                
-        # else:
-        #     if self.remaining_dues == 0:
-        #         # self.total_balance +=pa
-        #         if self.total_balance > da:
-        #             self.total_balance -= da
-        #         else:
-        #             self.remaining_dues += da - self.total_balance
-        #             self.total_balance = 0
-        #     else:
-        #         if da >pa:
-        #             if pa ==0:
-        #                 self.remaining_dues = self.remaining_dues + da
-        #             else:
-        #                 self.remaining_dues -= pa
-        #         else:
-        #             pass
-            # self.remaining_dues = self.remaining_dues + da
-            # print('remaining Amount',self.remaining_dues)
-            # if self.remaining_dues >= pa:
-            #     self.remaining_dues += da
-            # else:
-            #     self.total_balance += pa -self.remaining_dues
-            #     self.remaining_dues = 0
-                
-            
-
 
     def list(self,request):
         queryset = self.get_queryset()
@@ -401,28 +308,9 @@ class PaymentHistoryViewSet(viewsets.ModelViewSet):
                 'amount': obj.amount,
                 'pending_dues': current_due,
                 'balance': current_balance,
-                'payment_type': obj.payment_type
+                'payment_type': obj.get_payment_type_display()
             } 
             histories.append(tmp)           
         
         histories = histories[::-1]
         return Response(histories)
-        # for obj in objects:
-        #     temp = {
-        #         'paid_date':obj.date_created.strftime(('%m/%d/%Y %a,%H:%M %p')),
-        #         'fee_category':obj.fee_allocation.fee_category.name,
-        #         'fee_category_id':obj.fee_allocation.fee_category.id,
-        #         'dues':obj.fee_allocation.total_amount,
-        #         'paid_amount':obj.amount,
-        #         'payment_status':obj.payment_status,
-        #         'payment_type':obj.payment_type,
-        #         }
-        #     self.PaymentStateMentDetail(temp)
-        #     temp['remaining_dues'] = self.remaining_dues
-        #     temp['total_balance'] = self.total_balance
-        #     self.output.append(temp)
-            
-        # # payment_history['payment_history'] = output
-       
-        # # newlist = sorted(output, key=itemgetter('paid_date'),reverse=True)
-        # return Response(self.output)

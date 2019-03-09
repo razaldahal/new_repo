@@ -15,8 +15,9 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
 
-class ProductsViewSet(viewsets.ViewSet):
+class ProductsViewSet(viewsets.ModelViewSet):
     queryset = ProductsModel.objects.all()
+    serializer_class = ProductsSerializer
 
     def create(self,request):
         serializer = ProductsSerializer(data=request.data)
@@ -41,7 +42,7 @@ class ProductsViewSet(viewsets.ViewSet):
             })
 
     def list(self,request):
-        objects = self.queryset
+        objects = self.get_queryset()
         data = request.GET
         select_type = int(data['select_type'])
         if select_type == 0:

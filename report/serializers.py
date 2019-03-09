@@ -17,7 +17,7 @@ class StudentReportSerializer(serializers.ModelSerializer):
     student = StudentSerializer()
     class_name = serializers.CharField(source='_class.name')
     # course_name = serializers.CharField(source='_class.course.name')
-    section = serializers.CharField(source='section.name')
+    section = serializers.CharField(source='section.name', required=False)
     admission_date = serializers.DateTimeField(format='%Y%B%d')
     class Meta:
         model = StudentEnroll
@@ -30,7 +30,7 @@ class VehicleSerializer(serializers.ModelSerializer):
 
 class StudentVehicleReportSerializer(serializers.ModelSerializer):
     student = StudentSerializer()
-    vehicle  = VehicleSerializer()
+    vehicle  = VehicleSerializer(required=False)
     class Meta:
         model = VehicleAllocation
         fields = ('__all__')

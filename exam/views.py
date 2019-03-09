@@ -35,7 +35,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 				})
 
 	def list(self,request):
-		objects=self.queryset
+		objects=self.get_queryset()
 		output=[]
 		for obj in objects:
 			temp={'id':obj.id,
@@ -64,7 +64,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 		return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
 
 
-class ExamTermViewset(viewsets.ViewSet):
+class ExamTermViewset(viewsets.ModelViewSet):
     queryset = ExamTerm.objects.all()
     serializer_class = ExamTermSerializer
 
@@ -117,7 +117,7 @@ class ExamTermViewset(viewsets.ViewSet):
                 "Detail":[serializer.errors]
             })
     def list(self,request):
-        _queryset = self.queryset
+        _queryset = self.get_queryset()
         terms = []
         for obj in _queryset:
             temp = {
@@ -162,7 +162,7 @@ class ExamTermViewset(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ExamScheduleViewset(viewsets.ViewSet):
+class ExamScheduleViewset(viewsets.ModelViewSet):
     queryset = ExamSchedule.objects.all()
     serializer_class = ExamScheduleSerializer
 
@@ -193,7 +193,7 @@ class ExamScheduleViewset(viewsets.ViewSet):
             "Detail":[serializer.errors]
         })
     def list(self,request):
-        queryset = self.queryset
+        queryset = self.get_queryset()
         output = []
         for obj in queryset:
             temp = {
@@ -243,7 +243,7 @@ class MarksEntryGetViewSet(viewsets.ViewSet):
     queryset = Student.objects.all()
 
     def list(self,request):
-        objects = self.queryset
+        objects = self.get_queryset()
         output = []
         for obj in objects:
             temp={

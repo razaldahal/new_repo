@@ -82,7 +82,7 @@ class IssueViewSet(viewsets.ModelViewSet):
         return BookIssueSerializer
 
     def list(self, request):
-        queryset = self.queryset.filter(status=1)
+        queryset = self.get_queryset().filter(status=1)
         output = []
         for q in queryset:
             tmp = {

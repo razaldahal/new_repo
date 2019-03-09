@@ -12,7 +12,7 @@ class AcademicYearViewSet(ModelViewSet):
     http_method_names = ['post', 'get']
 
     def list(self, request):
-        data = self.get_serializer(self.queryset.filter(is_active=True).first()).data
+        data = self.get_serializer(self.get_queryset().filter(is_active=True).first()).data
         return Response(data)
 
     def create(self,request):
@@ -84,7 +84,7 @@ class CourseClassViewSet(ModelViewSet):
         return serializer_class(*args, **kwargs)
 
     def list(self, request, course_pk, pk=None):
-        queryset = self.queryset.filter(course_id=course_pk).all()
+        queryset = self.get_queryset().filter(course_id=course_pk).all()
         output = self.get_serializer(queryset, many=True).data
         return Response(output)
 
@@ -124,7 +124,7 @@ class ClassSectionViewSet(ModelViewSet):
         return serializer_class(*args, **kwargs)
 
     def list(self, request, class_pk, pk=None):
-        queryset = self.queryset.filter(_class_id=class_pk).all()
+        queryset = self.get_queryset().filter(_class_id=class_pk).all()
         output = self.get_serializer(queryset, many=True).data
         return Response(output)
 
@@ -155,7 +155,7 @@ class ClassExamTermViewSet(viewsets.ViewSet):
     queryset = ExamTerm.objects.all()
   
     def list(self, request, class_pk, pk=None):
-        queryset = self.queryset.filter(_class=class_pk).all()
+        queryset = self.get_queryset().filter(_class=class_pk).all()
         output = []
         for term in queryset:
             dct = {

@@ -21,8 +21,9 @@ class EventTypeViewSet(viewsets.ModelViewSet):
     serializer_class = EventTypeSerializer
     queryset = EventType.objects.all()
 
-class EventNotificationViewSet(viewsets.ViewSet):
+class EventNotificationViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
+    serializer_class = EventSerializer
 
     def list(self,request):
         output = []
@@ -33,7 +34,7 @@ class EventNotificationViewSet(viewsets.ViewSet):
         future_date = today_date + timedelta(days=7)
         # print(future_date)
        
-        objects = self.queryset.filter(date_start__lte = future_date,date_end__gte=today_date)
+        objects = self.get_queryset().filter(date_start__lte = future_date,date_end__gte=today_date)
         for obj in objects:
             temp = {
                 'id':obj.id,

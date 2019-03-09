@@ -31,7 +31,7 @@ class FacultyViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         faculties = []
-        objects = self.queryset
+        objects = self.get_queryset()
         for obj in objects:
             faculties.append(get_faculty_detail(obj))
 
