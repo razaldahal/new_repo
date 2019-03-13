@@ -151,8 +151,9 @@ class ClassSectionViewSet(ModelViewSet):
 
 
 
-class ClassExamTermViewSet(viewsets.ViewSet):
+class ClassExamTermViewSet(viewsets.ModelViewSet):
     queryset = ExamTerm.objects.all()
+    serializer_class = ClassSerializer
   
     def list(self, request, class_pk, pk=None):
         queryset = self.get_queryset().filter(_class=class_pk).all()

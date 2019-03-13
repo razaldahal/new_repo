@@ -123,28 +123,28 @@ WSGI_APPLICATION = 'EduInfosis.wsgi.application'
 
 
 # ## ASHISH SETTING
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'btech_eduinfosys',
-        'USER': 'postgres',
-        'PASSWORD': 'toor',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
-# DINESH SETTING
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'eduinfosis_merged',
+#         'NAME': 'btech_eduinfosys',
 #         'USER': 'postgres',
-#         'PASSWORD': 'dinesh',
+#         'PASSWORD': 'toor',
 #         'HOST': 'localhost',
 #         'PORT': '',
 #     }
 # }
+
+# DINESH SETTING
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'eduinfosis_merged',
+        'USER': 'postgres',
+        'PASSWORD': 'dinesh',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

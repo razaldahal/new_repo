@@ -7,6 +7,7 @@ from .serializers import *
 
 from .models import *
 from academic.models import Class,Course
+from student.models import *
 
 
 
@@ -35,7 +36,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 				})
 
 	def list(self,request):
-		objects=self.get_queryset()
+		objects = Subject.objects.all()
 		output=[]
 		for obj in objects:
 			temp={'id':obj.id,
@@ -64,58 +65,19 @@ class SubjectViewSet(viewsets.ModelViewSet):
 		return Response({'Success!':'Deleted Subject instance succesfully'},status=status.HTTP_204_NO_CONTENT)
 
 
+class ClassSubjectViewSet(viewsets.ModelViewSet):
+    queryset = AssignSubject.objects.all()  
+    serializer_class = ClassSubjectSerializer
+
+    def list(self,request):
+        objects = AssignSubject.objects.filter(_class_id=request.GET['class'])
+        data = ClassSubjectSerializer(objects,many=True).data
+        return Response(data)
+
 class ExamTermViewset(viewsets.ModelViewSet):
     queryset = ExamTerm.objects.all()
     serializer_class = ExamTermSerializer
 
-    def get_object(self,pk):
-        try:
-            return ExamTerm.objects.get(id=pk)
-        except:
-            raise serializers.ValidationError({
-                "Detail":["Exams With this id not Exist"]
-            })
-
-    def create(self,request):
-        serializer = ExamTermSerializer(data=request.data)
-       # serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            data = serializer.data
-
-            try:
-                c_id = Course.objects.get(id=data['course'])
-            except:
-                raise serializers.ValidationError({
-                    "Detail":['Course With This Id Dont Exist']
-                })
-            try:
-                _c_id = Class.objects.get(id=data['_class'])
-            except:
-                raise serializers.ValidationError({
-                    "Detail":['Class With This Id Dont Exist']
-                })
-            # val = seria
-            
-            if c_id and _c_id:
-                _exm,c = ExamTerm.objects.get_or_create(name = data['name'],
-                                                     _class_id= data['_class'],
-                                                    defaults = {
-                                                        'start_date':data['start_date'],
-                                                        'end_date':data['end_date'],
-                                                        'course_id':data['course'],
-                                                        
-                                                    })
-                if not c:
-                    raise serializers.ValidationError({
-                    "Detail":['Exam With This name Already Exist']
-                                                })
-                return Response(data , status=status.HTTP_201_CREATED)
-                                        
-        else:
-            raise serializers.ValidationError({
-                "Detail":[serializer.errors]
-            })
     def list(self,request):
         _queryset = self.get_queryset()
         terms = []
@@ -125,7 +87,6 @@ class ExamTermViewset(viewsets.ModelViewSet):
                'name':obj.name,
                'start_date':obj.start_date,
                'end_date':obj.end_date,
-               'course':obj.course.name,
                '_class':obj._class.name
 
                 }
@@ -134,32 +95,15 @@ class ExamTermViewset(viewsets.ModelViewSet):
         return Response(terms,status=status.HTTP_200_OK)
 
     def retrieve(self,request,pk):
-        obj = self.get_object(pk)
+        obj = self.get_object()
         term = {
             'id':obj.id,
             'name':obj.name,
             'start_date':obj.start_date,
             'end_date':obj.end_date,
-            'course':obj.course.name,
             '_class':obj._class.name
         }
         return Response(term, status=status.HTTP_200_OK)
-
-    def update(self,request,pk):
-        instance = self.get_object(pk)
-        serializer = ExamUpdateSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.data
-           # print(data)
-            serializer.partial_update(instance,data)
-            return Response(data,status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self,request,pk):
-        instance = self.get_object(pk)
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ExamScheduleViewset(viewsets.ModelViewSet):
@@ -239,27 +183,30 @@ class ExamScheduleViewset(viewsets.ModelViewSet):
             "Detail":[serializer.errors]
         })
 
-class MarksEntryGetViewSet(viewsets.ViewSet):
-    queryset = Student.objects.all()
+class MarksEntryGetViewSet(viewsets.ModelViewSet):
+    queryset = MarksEntryDetail.objects.all()
+    serializer_class = MarksEntrySerializer
 
     def list(self,request):
-        objects = self.get_queryset()
-        output = []
-        for obj in objects:
-            temp={
-                'id':obj.id,
-                'name':obj.user.first_name + ' '+ obj.user.last_name,
-                'theory':0,
-                'practical':0,
-                'total':0,
-                'result':'fail'
-            }
-            output.append(temp)
-        return Response(output,status=status.HTTP_200_OK)
-        
+        objects = MarksEntryDetail.objects.filter(marks_entry__subject_id=request.GET['subject'],
+                                                marks_entry__section_id=request.GET['section'],
+                                                marks_entry__section___class_id=request.GET['class'],
+                                                marks_entry__exam_id = request.GET['exam'])
 
-class MarksEntryViewSet(viewsets.ViewSet):
+        std_objects = StudentEnroll.objects.filter(_class_id=request.GET['class'],
+                                                    section_id=request.GET['section'])
+        
+        if not objects:
+            data= MarksEntryGetSerializer(std_objects,many=True).data
+            return Response(data)
+
+        data = MarksEntryGetSerializer(objects,many=True).data
+        return Response(data)
+
+
+class MarksEntryViewSet(viewsets.ModelViewSet):
     queryset = MarksEntry.objects.all()
+    serializer_class = MarksEntrySerializer()
 
     def create(self,request):
         serializer = MarksEntrySerializer(data=request.data)
@@ -267,42 +214,27 @@ class MarksEntryViewSet(viewsets.ViewSet):
             data = serializer.data
             std_data = data['student_data']
             marks_type = data['marks_type']
+            print(marks_type)
             try:
                 ExamTerm.objects.get(id=data['exam'])
             except:
                 raise serializers.ValidationError({
                     "Detail":['Exam With This Id Not Exist']
                 })
-            me,created = MarksEntry.objects.get_or_create(section_id=data['section'],
+            me,created = MarksEntry.objects.update_or_create(section_id=data['section'],
                                         exam_id=data['exam'],
-                                        subject_id=data['subject'],)
-            if not created:
-                raise serializers.ValidationError({
-                    "Detail":['Subject Should Unique']
-                })
-            print(me.id)
+                                        subject_id=data['subject'],
+                                        defaults={**marks_type})
             for dct in std_data:
-                obj,created = MarksEntryDetail.objects.get_or_create(student_id=dct['id'],
+                obj,created = MarksEntryDetail.objects.update_or_create(student_id=dct['id'],
                                                                     marks_entry_id=me.id,
                                                                 defaults={
                                                                     'discipline':data['discipline'],
                                                                     'theory':dct['theory'],
                                                                     'practical':dct['practical'],
-                                                                    'full_marks':marks_type['full_marks'],
-                                                                    'full_marks_th':marks_type['full_marks_th'],
-                                                                    'full_marks_pr':marks_type['full_marks_pr'],
-                                                                    'pass_marks':marks_type['pass_marks'],
-                                                                    'pass_marks_th':marks_type['pass_marks_th'],
-                                                                    'pass_marks_pr':marks_type['pass_marks_pr']
+                                                                    
                                                       }) 
-                if not created:
-                    raise serializers.ValidationError({
-                        "Detail":["Student with this id Already Recorded"]
-                    })
-                bol = True
-    
-            if bol:
-                return Response(data,status=status.HTTP_201_CREATED)
+            return Response(data,status=status.HTTP_201_CREATED)
         raise serializers.ValidationError({
             "Detail":[serializer.errors]
         })
@@ -341,16 +273,9 @@ class ViewResultViewSet(viewsets.ViewSet):
        
         return Response(mydict,status=status.HTTP_200_OK)
 
-class PrepareResultViewSet(viewsets.ViewSet):
+class PrepareResultViewSet(viewsets.ModelViewSet):
     queryset = MarksEntry.objects.all()
-
-    def get_filter(self,section_id,subject_id,exam_id):
-        return MarksEntryDetail.objects.filter(marks_entry__section_id=
-                                                section_id,
-                                                marks_entry__subject_id=
-                                                subject_id,
-                                                marks_entry__exam_id=
-                                                exam_id,)
+    serializer_class = ResultPrepareViewSet
 
     def create(self,request):
         data = request.data
@@ -377,19 +302,13 @@ class PrepareResultViewSet(viewsets.ViewSet):
         section_id = searchword.get('section')
         subject_id = searchword.get('subject')
         exam_id = searchword.get('exam')
-        med = self.get_filter(section_id,subject_id,exam_id)
-        output = []
-        for marks in med:
-            temp = {
-                'student_id':marks.student.id,
-                'student_name':marks.student.user.first_name + ' ' + marks.student.user.last_name,
-                'theory':marks.theory ,
-                'practical':marks.practical,
-                'total':marks.theory + marks.practical,
-                'discipline':marks.discipline,
-               
-            }
-            output.append(temp)
+        objects = MarksEntryDetail.objects.filter(marks_entry__section_id=
+                                                section_id,
+                                                marks_entry__subject_id=
+                                                subject_id,
+                                                marks_entry__exam_id=
+                                                exam_id,)
+        output = ResultPrepareViewSet(objects,many=True).data
         return Response(output,status=status.HTTP_200_OK)
 
 
