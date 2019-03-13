@@ -55,5 +55,5 @@ class MarksEntryDetail(BaseModel):
     discipline = models.IntegerField()
 
 
-    # def __str__(self):
-    #     return '{} Obj For  {}'.format(self.student.user.first_name,self.marks_entry.subject.name)
+    def __str__(self):
+        return '{} Obj For  {}'.format(self.student.user.first_name,self.marks_entry.subject.name)

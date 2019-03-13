@@ -239,39 +239,7 @@ class MarksEntryViewSet(viewsets.ModelViewSet):
             "Detail":[serializer.errors]
         })
 
-class ViewResultViewSet(viewsets.ViewSet):
-    queryset = MarksEntryDetail.objects.all()
 
-   
-    def retrieve(self,request,pk):
-        output = []
-        objects= MarksEntryDetail.objects.filter(student_id=pk)
-        std = objects[0]
-
-        mydict = {
-            'name':std.student.user.first_name +' '+ std.student.user.last_name,
-        }
-
-        subjects = []
-        total_mark = 0
-        for obj in objects:
-            temp = {
-                'subject':obj.marks_entry.subject.name,
-                'theory':obj.theory,
-                'practical':obj.practical,
-                'pass_mark':obj.pass_marks,
-                'full_mark':obj.full_marks,
-                'total_in_sub':obj.theory + obj.practical,
-            }
-            total = obj.theory + obj.practical
-            total_mark =total_mark + total
-            subjects.append(temp)
-       
-        
-        mydict['markdetail'] = subjects
-        mydict['total_mark'] = total_mark
-       
-        return Response(mydict,status=status.HTTP_200_OK)
 
 class PrepareResultViewSet(viewsets.ModelViewSet):
     queryset = MarksEntry.objects.all()
@@ -312,19 +280,39 @@ class PrepareResultViewSet(viewsets.ModelViewSet):
         return Response(output,status=status.HTTP_200_OK)
 
 
+class ViewResultViewSet(viewsets.ModelViewSet):
+    queryset = MarksEntryDetail.objects.all()
+    serializer_class = ResultPrepareViewSet
 
-# output = {}
-# med = MarksEntryDetail.objects.filter(marks_entry__section_id=<input>, ....)
-# for m in med:
-#     student_id = m.student.id
+    def retrieve(self,request,pk):
+        student_id = pk
+        output = []
+        objects= MarksEntryDetail.objects.filter(student_id=pk)
+        std = objects[0]
 
-#     tmp = {
-#         'student_name': m.student.first_name,
-#         'theory' : m.theory
-#     }
-#     if student_id not in output:
-#         output[student_id] = tmp
-#     else:
-#         tmp1 = output[student_id]
-#         tmp1['theory'] += m.theory
-#         output[student_id] = tmp1
+        mydict = {
+            'name':std.student.user.first_name +' '+ std.student.user.last_name,
+        }
+
+        subjects = []
+        total_mark = 0
+        if request.GET['marksheet']=='marksheet':
+            for obj in objects:
+                temp = {
+                    'subject':obj.marks_entry.subject.name,
+                    'theory':obj.theory,
+                    'practical':obj.practical,
+                    'pass_mark':obj.marks_entry.pass_marks,
+                    'full_mark':obj.marks_entry.full_marks,
+                    'total_in_sub':obj.theory + obj.practical,
+                }
+                total_mark += obj.theory + obj.practical
+                subjects.append(temp)
+           
+            
+            mydict['markdetail'] = subjects
+            mydict['total_mark'] = total_mark
+           
+            return Response(mydict,status=status.HTTP_200_OK)
+        elif request.GET['marksheet']=='grade':
+            return Response("Grade is making")
