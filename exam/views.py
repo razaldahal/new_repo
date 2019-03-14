@@ -314,5 +314,5 @@ class ViewResultViewSet(viewsets.ModelViewSet):
             mydict['total_mark'] = total_mark
            
             return Response(mydict,status=status.HTTP_200_OK)
-        elif request.GET['marksheet']=='grade':
+        elif request.GET['marksheet']=='gpa':
             return Response("Grade is making")
