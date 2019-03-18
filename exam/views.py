@@ -214,7 +214,7 @@ class MarksEntryViewSet(viewsets.ModelViewSet):
             data = serializer.data
             std_data = data['student_data']
             marks_type = data['marks_type']
-            print(marks_type)
+            # print(marks_type)
             try:
                 ExamTerm.objects.get(id=data['exam'])
             except:
@@ -247,7 +247,7 @@ class PrepareResultViewSet(viewsets.ModelViewSet):
 
     def create(self,request):
         data = request.data
-        print(data)
+        # print(data)
     
         for objs in data['result_preparation']:
             obj = MarksEntryDetail.objects.filter(student_id=objs['student_id'])
@@ -267,17 +267,79 @@ class PrepareResultViewSet(viewsets.ModelViewSet):
 
     def list(self,request):
         searchword=request.GET
+        # class_id = searchword.get('class')
         section_id = searchword.get('section')
         subject_id = searchword.get('subject')
         exam_id = searchword.get('exam')
-        objects = MarksEntryDetail.objects.filter(marks_entry__section_id=
-                                                section_id,
-                                                marks_entry__subject_id=
-                                                subject_id,
-                                                marks_entry__exam_id=
-                                                exam_id,)
-        output = ResultPrepareViewSet(objects,many=True).data
-        return Response(output,status=status.HTTP_200_OK)
+        if searchword['result_by'] == 'subjectwise':
+            objects = MarksEntryDetail.objects.filter(marks_entry__section_id=
+                                                    section_id,
+                                                    marks_entry__subject_id=
+                                                    subject_id,
+                                                    marks_entry__exam_id=
+                                                    exam_id,)
+            output = ResultPrepareViewSet(objects,many=True).data
+            return Response(output,status=status.HTTP_200_OK)
+        if searchword['result_by'] == 'classwise':
+            student_id = []
+            output = []
+            r_dct = []
+
+            std_obj = StudentEnroll.objects.filter(section__id=section_id,).all()
+            for si in std_obj:
+                student_id.append(si.student.id)
+            objects = MarksEntryDetail.objects.filter(student__id__in=student_id,marks_entry__exam_id=exam_id)
+            
+            for obj in objects:
+                subject_detail = []
+                student_result = {}
+
+                if not obj.student.id in r_dct:
+                    r_dct.append(obj.student.id)
+                    student_result['student_name'] = '{} {}'.format(obj.student.user.first_name ,obj.student.user.last_name )
+                    student_result['student_id'] = obj.student.id
+                    sd = {
+                        'subject_name':obj.marks_entry.subject.name,
+                        'theory':obj.theory,
+                        'practical':obj.practical,
+                        'total':obj.theory + obj.practical,
+                        
+                        }
+                    subject_detail.append(sd)
+                    student_result['subject_detail'] = subject_detail
+                    output.append(student_result)
+
+                else:
+                    for i,item in enumerate(output):
+                        if item['student_id'] == obj.student.id:
+                            sd = {
+                                'subject_name':obj.marks_entry.subject.name,
+                                'total':obj.theory + obj.practical,
+                                }
+                            item['subject_detail'].append(sd)
+            return Response(output,status=status.HTTP_200_OK)
+# [  
+#         {
+#             'student_name':'dinesh kc',
+#             'subject_detail':[
+#                                 {
+#                                     'name':'subject_name',
+#                                     -----other detail ---
+#                                 },
+#                                 {
+#                                     'name':'subject_name',
+#                                     -----other detail ---
+#                                 },
+#                             ]
+#         }
+# ]
+
+# Student_name  mathematics    english    social    results 
+#                TH  PR        TH  PR     TH  PR 
+# Dinesh kc      20 30          10 20     23  23 
+# sonika sunar   20 30          10 20     23  23 
+# divyani chau   20 30          10 20     23  23 
+# suraj bhat     20 30          10 20     23  23 
 
 
 class ViewResultViewSet(viewsets.ModelViewSet):
@@ -315,4 +377,27 @@ class ViewResultViewSet(viewsets.ModelViewSet):
            
             return Response(mydict,status=status.HTTP_200_OK)
         elif request.GET['marksheet']=='gpa':
-            return Response("Grade is making")
+            grade = []
+            go = GradingSystem.objects.all().order_by('marks_from')
+            for obj in objects:
+                temp = {
+                'subject_name':obj.marks_entry.subject.name,
+                    }
+                for o in go:
+                    if obj.theory >= o.marks_from and obj.theory <o.marks_to:
+                        temp['theory_grade'] = o.grade_division
+                        temp['theory_gp'] = o.grade_point
+                    if obj.practical >= o.marks_from and obj.practical <o.marks_to:
+                        temp['practical_grade'] = o.grade_division
+                        temp['practical_gp'] = o.grade_point
+            
+                grade.append(temp)
+                
+            return Response(grade)
+        else:
+            return Response("Sorry This Type Of Marksheet Now Exist")
+
+class GradingViewSet(viewsets.ModelViewSet):
+    queryset = GradingSystem.objects.all().order_by('-marks_from')
+    serializer_class = GradingSerializer
+

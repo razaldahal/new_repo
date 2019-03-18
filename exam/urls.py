@@ -12,6 +12,7 @@ router.register(r'marks-entry/get',views.MarksEntryGetViewSet)
 router.register(r'marks-entry',views.MarksEntryViewSet)
 router.register(r'view-result',views.ViewResultViewSet)
 router.register(r'prepare_result',views.PrepareResultViewSet)
+router.register(r'grading',views.GradingViewSet)
 
 
 urlpatterns = [

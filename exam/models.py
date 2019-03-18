@@ -57,3 +57,10 @@ class MarksEntryDetail(BaseModel):
 
     def __str__(self):
         return '{} Obj For  {}'.format(self.student.user.first_name,self.marks_entry.subject.name)
+
+class GradingSystem(BaseModel):
+    marks_from = models.IntegerField()
+    marks_to = models.IntegerField()
+    grade_division = models.CharField(max_length=2)
+    explanation = models.CharField(max_length=30)
+    grade_point = models.FloatField()
