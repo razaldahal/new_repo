@@ -46,7 +46,7 @@ class GuardianSerializer(serializers.ModelSerializer):
     type = serializers.CharField(required=False)
     mobile = serializers.CharField(required=False, allow_null=True)
     job = serializers.CharField(required=False, allow_null=True)
-    citizenship_no = serializers.CharField(required=False, allow_null=True)
+    citizenship_no = serializers.CharField(required=False,allow_null=True, allow_blank=True)
 
     class Meta:
         model = Guardian
@@ -64,6 +64,7 @@ class StudentAdmissionSerializer(serializers.Serializer):
     registration_no = serializers.CharField()
     course = serializers.IntegerField()
     _class = serializers.IntegerField()
+    roll_no = serializers.IntegerField()
     section = serializers.IntegerField(required=False)
     admission_date = serializers.DateTimeField(required=False)
     user = UserPostSerializer()
@@ -78,6 +79,7 @@ class StudentGetSerializer(StudentAdmissionSerializer):
     address = AddressSerializer(required=False)
     father = GuardianSerializer(required=False)
     mother = GuardianSerializer(required=False)
+    roll_no = serializers.IntegerField()
 
     course_name = serializers.CharField(required=False)
     class_name = serializers.CharField(required=False)

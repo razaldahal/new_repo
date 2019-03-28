@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework import status
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -24,7 +25,7 @@ def generate_username(input_username):
         return '{}_{}'.format(input_username,digit)
 
 
-def get_student_detail(obj):
+def get_student_detail(obj, lis=True):
     f = obj.guardian.filter(type='father')
     if f:
         obj.father = f.first()
@@ -37,7 +38,11 @@ def get_student_detail(obj):
     if a:
         obj.address = a.first()
 
-    se = StudentEnroll.objects.filter(student=obj, academic_year=get_current_year())
+    params = {'student':obj}
+    if lis:
+        params['academic_year'] = get_current_year()
+    se = StudentEnroll.objects.filter(**params)
+    # print('hsdjsdsdhf',se)
     if se:
         se = se.first()
         obj.admission_date = se.admission_date
@@ -46,6 +51,7 @@ def get_student_detail(obj):
         obj._class = se._class_id
         obj.class_name = se._class.name
         obj.section = se.section_id
+        obj.roll_no = se.roll_no
     return obj
 
 class StudentAdmissionViewSet(ModelViewSet):
@@ -55,22 +61,44 @@ class StudentAdmissionViewSet(ModelViewSet):
     http_method_names = ['post']
 
 
+
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             data = serializer.data
-
             ud = data['user']
 
             if 'username' in ud:
-                print ('this student is already registered . so just update...')
+                student,boo = Student.objects.get_or_create(user_id=ud['id'],registration_no = data['registration_no'])
+                if not boo:
+                    raise serializers.ValidationError({
+                        'Detail':['User_id & registration_no Should be Unique']
+                        })
+                year = get_current_year()
+      
+                params = {
+                    'academic_year':year,
+                    'student':student
+                    }
+                defaults = {
+                    '_class_id':data['_class']
+                    }
+                if 'section' in data:
+                    defaults['section_id'] = data['section']
+                if 'admission_date' in data:
+                    defaults['admission_date'] = data['admission_date']
+
+                StudentEnroll.objects.get_or_create(**params, defaults={**defaults})
                 return Response(data)
 
-
             username = generate_username(ud['first_name'])
-            print(username)
+            # print(username)
             ud['type'] = 3
-
+            
+            if ud['email'] is None:
+                ud['email'] = username + '@btech.com'
+                # print(ud)
+                # print({}.format(ud['email']))
             user, c = User.objects.get_or_create(
                     username = username,
                     defaults = {**ud}
@@ -108,11 +136,12 @@ class StudentAdmissionViewSet(ModelViewSet):
                     )
 
             year = get_current_year()
-            
+            # print(year)
 
             params = {
                 'academic_year':year,
-                'student':student
+                'student':student,
+                'roll_no':data['roll_no']
                 
             }
             defaults = {
@@ -159,8 +188,10 @@ class StudentViewSet(ModelViewSet):
             raise serializers.ValidationError({'Detail':[serializer.errors]})
 
     def list(self, request, *args, **kwargs):
+        print(get_current_year())
         students = []
         objects = self.get_queryset()
+        # objects = StudentEnroll.objects.filter(academic_year=get_current_year())
         section_id = request.GET.get('section_id', False)
         if section_id:
             objects = []
@@ -170,7 +201,7 @@ class StudentViewSet(ModelViewSet):
 
         for obj in objects:
             students.append(get_student_detail(obj))
-
+        
         students = StudentGetSerializer(students, many=True).data
         return Response(students)
 
@@ -238,8 +269,9 @@ class StudentSearchViewSet(APIView):
             print(filter_params)
             students = []
             objects = Student.objects.filter(**filter_params)
+            # print('{}objects'.format(objects))
             for obj in objects:
-                obj = get_student_detail(obj)
+                obj = get_student_detail(obj, False)
 
                 students.append(obj)
 

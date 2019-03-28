@@ -36,6 +36,7 @@ class StudentEnroll(BaseModel):
     student = models.ForeignKey(Student,on_delete=models.CASCADE)
     _class = models.ForeignKey(Class,on_delete=models.CASCADE)
     section = models.ForeignKey(Section,on_delete=models.CASCADE, null=True, blank=True)
+    roll_no = models.IntegerField()
 
     admission_date = models.DateTimeField(auto_now_add=True)
 
