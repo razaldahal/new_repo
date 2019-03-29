@@ -138,7 +138,7 @@ WSGI_APPLICATION = 'EduInfosis.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'eduinfosis_merged',
+        'NAME': 'rec',
         'USER': 'postgres',
         'PASSWORD': 'dinesh',
         'HOST': 'localhost',

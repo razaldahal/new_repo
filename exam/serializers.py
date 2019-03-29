@@ -10,7 +10,21 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ('name','description','code','id')
 
-class ClassSubjectSerializer(serializers.ModelSerializer):
+class ClassSubjectPostSerializer(serializers.ModelSerializer):
+    _class_id = serializers.IntegerField()
+    subject_id = serializers.IntegerField()
+    class Meta:
+        model = AssignSubject
+        fields = ('id','_class_id','subject_id')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=AssignSubject.objects.all(),
+                fields=('subject_id','_class_id'),
+            )
+        ]
+
+
+class ClassSubjectGetSerializer(serializers.ModelSerializer):
     class_name = serializers.CharField(source='_class.name')
     subject = serializers.CharField(source='subject.name')
     id = serializers.IntegerField(source="subject.id")

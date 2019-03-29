@@ -67,11 +67,12 @@ class SubjectViewSet(viewsets.ModelViewSet):
 
 class ClassSubjectViewSet(viewsets.ModelViewSet):
     queryset = AssignSubject.objects.all()  
-    serializer_class = ClassSubjectSerializer
+    serializer_class = ClassSubjectPostSerializer
 
     def list(self,request):
-        objects = AssignSubject.objects.filter(_class_id=request.GET['class'])
-        data = ClassSubjectSerializer(objects,many=True).data
+        # objects = AssignSubject.objects.filter(_class_id=request.GET['class'])
+        objects = self.get_queryset()
+        data = ClassSubjectGetSerializer(objects,many=True).data
         return Response(data)
 
 class ExamTermViewset(viewsets.ModelViewSet):
